@@ -8,8 +8,14 @@
     <link href="~/assets/tailwind.css" rel="stylesheet" />
     <link href="~/assets/ui.css" rel="stylesheet" />
   </head>
-  <body>
-    <div id="app"></div>
+  <body class="place-items-center">
+    <div id="app" class="flex flex-col gap-2">
+      <h1 class="font-mono text-xl text-center">Singularity</h1>
+      <hr class="border-zinc-600" />
+      <section id="quick-options"></section>
+      <button id="manager-link" class="primary">Manage Snippets</button>
+      <p class="text-zinc-400 mt-4 text-center">Made by Ross Cooper</p>
+    </div>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
