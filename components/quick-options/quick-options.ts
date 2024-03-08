@@ -1,5 +1,5 @@
+import '@/assets/controls.css';
 import { options } from '@/utils/preferences/storage';
-import './styles.css';
 import { BundledTheme, bundledThemesInfo } from 'shiki';
 import { prefersDark } from '@/utils/preferences/color-scheme';
 import { log } from '@/utils/log';

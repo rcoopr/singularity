@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Singularity Options</title>
+    <meta name="manifest.type" content="browser_action" />
+    <link href="~/assets/tailwind.css" rel="stylesheet" />
+    <link href="~/assets/ui.css" rel="stylesheet" />
+    <link href="~/assets/controls.css" rel="stylesheet" />
+  </head>
+  <body class="justify-center min-h-screen">
+    <div id="app" class="h-screen grid gap-4 grid-rows-[auto,1fr,auto] overflow-hidden">
+      <header>
+        <h1 class="font-mono text-xl mb-2">Singularity</h1>
+        <hr class="border-zinc-600" />
+        <section id="options"></section>
+      </header>
+      <main>
+        <section id="snippet-manager" class="h-full">
+          <div
+            class="split-panel-container w-full h-full min-h-[400px] flex rounded-md overflow-hidden"
+          >
+            <aside class="split-panel w-[20%]">
+              <section
+                id="snippet-list"
+                class="list-none p-0 m-0 flex flex-col grow gap-1 overflow-y-auto bg-zinc-800 rounded-md"
+              ></section>
+              <button id="add-snippet" class="rounded-md">Add Snippet</button>
+              <dialog>
+                <form method="dialog" id="add-snippet-form">
+                  <h1>Add Snippet</h1>
+                  <div class="flex items-center gap-4 mb-4">
+                    <label>
+                      <span>Name:</span>
+                      <input class="mt-2" type="text" name="name" required />
+                    </label>
+                    <fieldset>
+                      <legend class="label">Context:</legend>
+                      <input
+                        type="radio"
+                        name="context"
+                        id="context-composition"
+                        value="composition"
+                      />
+                      <label for="context-composition">Composition</label>
+                      <input type="radio" name="context" id="context-global" value="global" />
+                      <label for="context-global">Global</label>
+                      <input type="radio" name="context" id="context-overlay" value="overlay" />
+                      <label for="context-overlay">Overlay</label>
+                      <input type="radio" name="context" id="context-shared" value="shared" />
+                      <label for="context-shared">Shared</label>
+                    </fieldset>
+                  </div>
+                  <label>
+                    <span>Description:</span>
+                    <input class="mt-2 mb-4" type="text" name="description" />
+                  </label>
+                  <label>
+                    <span>Code:</span>
+                    <textarea class="mt-2" type="text" name="code" required></textarea>
+                  </label>
+                  <menu>
+                    <button type="submit">Submit</button>
+                    <button type="reset">Close</button>
+                  </menu>
+                </form>
+              </dialog>
+            </aside>
+            <div
+              class="separator bg-zinc-900 cursor-col-resize bg-no-repeat bg-center w-2 select-none"
+            ></div>
+            <div class="split-panel w-[80%]">
+              <header
+                class="flex items-center flex-wrap justify-between gap-4 bg-zinc-800 rounded-md p-2"
+              >
+                <h2 id="snippet-description" class="font-semibold"></h2>
+                <div class="flex items-center gap-2">
+                  <button id="edit-snippet-button">Edit Snippet</button>
+                  <button id="delete-snippet-button">Delete</button>
+                </div>
+              </header>
+              <section id="snippet-editor" class="grow rounded-md overflow-hidden"></section>
+            </div>
+          </div>
+        </section>
+        <!-- <section id="keybinds-manager"></section> -->
+      </main>
+      <footer><p class="text-zinc-400 mt-4">Made by Ross Cooper</p></footer>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

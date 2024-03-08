@@ -27,14 +27,13 @@
 }
 .radio-group label:hover {
   z-index: 2;
-  border-color: #646cff;
+  border-color: theme('colors.indigo.500');
 }
 .radio-group input:checked + label {
   z-index: 1;
   background: theme('colors.indigo.800');
   border-color: theme('colors.indigo.500');
-  /* background-color: #1a1a1a; */
-  color: #ffffff;
+  color: theme('colors.white');
 }
 
 .select {
