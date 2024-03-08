@@ -24,6 +24,8 @@
     "wxt": "^0.17.0"
   },
   "dependencies": {
-    "@webext-core/messaging": "^1.4.0"
+    "@webext-core/messaging": "^1.4.0",
+    "@webext-core/storage": "^1.2.0",
+    "shiki": "^1.1.7"
   }
 }
