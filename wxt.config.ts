@@ -12,6 +12,10 @@ export default defineConfig({
         matches: ['<all_urls>'],
       },
     ],
-    permissions: ['contextMenus', 'clipboardRead', 'tabs'],
+    permissions: ['contextMenus', 'tabs', 'storage', 'clipboardRead', 'clipboardWrite'],
+    host_permissions: ['*://*.google.com/*', '*://app.singular.live/compositions/*/script'],
+    content_security_policy: {
+      extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
+    },
   },
 });
