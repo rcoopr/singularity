@@ -6,15 +6,9 @@ import { options } from '@/utils/preferences/storage';
 export function renderSnippetEditor(snippet: Snippet | undefined) {
   const root = document.querySelector<HTMLDivElement>('#snippet-editor');
 
-  if (!root) {
-    log.warn('No root element found for snippet editor');
-    return;
-  }
-
-  updateHeader(snippet);
-
   // render current snippet names in folders + set up listeners to keep it updated
   renderSnippetCode(root, snippet);
+  updateHeader(snippet);
 }
 
 function updateHeader(snippet: Snippet | undefined) {
@@ -25,11 +19,18 @@ function updateHeader(snippet: Snippet | undefined) {
     snippet?.name || html`<span class="text-zinc-400 italic">No description</span>`;
 }
 
+let storedSnippet: Snippet | undefined;
 async function renderSnippetCode(
-  root: HTMLElement,
+  root: HTMLElement | null,
   selectedSnippet: Snippet | undefined,
   theme?: BundledTheme
 ) {
+  storedSnippet = selectedSnippet;
+  if (!root) {
+    log.warn('No root element found for snippet editor');
+    return;
+  }
+
   if (!selectedSnippet) {
     root.innerHTML = html`<p class="snippet-editor-empty">No snippet selected</p>`;
     return;
@@ -61,4 +62,8 @@ async function renderSnippetCode(
   snippetPreview.prepend(copyButton);
 
   if (!existingSnippet) root.appendChild(snippetPreview);
+}
+
+export function updateEditorTheme(theme: BundledTheme) {
+  renderSnippetCode(document.querySelector('#snippet-editor'), storedSnippet, theme);
 }

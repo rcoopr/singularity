@@ -1,6 +1,4 @@
-import { updateDialogs } from '@/components/snippet-manager/dialogs';
 import { selectSnippet } from '@/components/snippet-manager/select-snippet';
-import { renderSnippetEditor } from '@/components/snippet-manager/snippet-editor';
 import { Snippet, getSnippetsRepo, groupSnippetsByContext } from '@/utils/snippets/repo';
 
 var isInitialized = false;
