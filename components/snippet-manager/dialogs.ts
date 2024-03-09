@@ -1,19 +1,11 @@
-import { renderSnippetList } from '@/components/snippet-manager/snippet-list';
-import {
-  Snippet,
-  getSnippetsRepo,
-  groupSnippetsByContext,
-  isSnippetContext,
-} from '@/utils/snippets/repo';
-import { snippetEditor, snippetList } from '../../entrypoints/manager/main';
-import { renderSnippetEditor } from '@/components/snippet-manager/snippet-editor';
+import { Snippet, getSnippetsRepo, isSnippetContext } from '@/utils/snippets/repo';
+import { selectSnippet } from '@/components/snippet-manager/select-snippet';
 
 var isInitialized = false;
 export function initDialogs() {
   if (isInitialized) return;
   isInitialized = true;
 
-  const snippetsRepo = getSnippetsRepo();
   const dialogs = document.querySelectorAll('dialog');
 
   for (const dialog of dialogs) {
@@ -41,9 +33,7 @@ export function initDialogs() {
         log.error('Error submitting form', err);
       }
 
-      renderSnippetList(snippetList, groupSnippetsByContext(await snippetsRepo.getAll()), snippet);
-      updateDialogs(snippet);
-      renderSnippetEditor(snippetEditor, snippet);
+      selectSnippet(snippet);
 
       if (trigger.includes('add')) form.reset();
       dialog.close();

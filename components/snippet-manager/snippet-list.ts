@@ -1,12 +1,14 @@
 import { updateDialogs } from '@/components/snippet-manager/dialogs';
+import { selectSnippet } from '@/components/snippet-manager/select-snippet';
 import { renderSnippetEditor } from '@/components/snippet-manager/snippet-editor';
-import { snippetEditor } from '@/entrypoints/manager/main';
 import { Snippet, getSnippetsRepo, groupSnippetsByContext } from '@/utils/snippets/repo';
 
 var isInitialized = false;
-export async function initSnippetList(root: HTMLElement | null) {
+export async function initSnippetList() {
   if (isInitialized) return;
   isInitialized = true;
+
+  const root = document.querySelector<HTMLDivElement>('#snippet-list');
 
   if (!root) {
     log.warn('No root element found for snippet list');
@@ -18,21 +20,19 @@ export async function initSnippetList(root: HTMLElement | null) {
 
   // render current snippet names in folders + set up listeners to keep it updated
   const selectedSnippet = snippets[0]?.snippets[0];
-  renderSnippetList(root, snippets);
-  updateSelectedSnippetItem(root, selectedSnippet);
-  renderSnippetEditor(snippetEditor, selectedSnippet);
-  updateDialogs(selectedSnippet);
+  selectSnippet(selectedSnippet);
 }
 
-export async function renderSnippetList(
-  root: HTMLElement | null,
-  folders: ReturnType<typeof groupSnippetsByContext>,
-  selectedSnippet?: Snippet
-) {
+export async function renderSnippetList(selectedSnippet?: Snippet) {
+  const root = document.querySelector<HTMLDivElement>('#snippet-list');
+
   if (!root) {
     log.warn('No root element found for snippet list');
     return;
   }
+
+  const snippetsRepo = getSnippetsRepo();
+  const folders = groupSnippetsByContext(await snippetsRepo.getAll());
 
   root.innerHTML = '';
 
@@ -66,12 +66,8 @@ export async function renderSnippetList(
       }
 
       snippetItem.addEventListener('click', async () => {
-        root.querySelectorAll('.selected').forEach((el) => el.classList.remove('selected'));
-        snippetItem.classList.add('selected');
-
         const newSelectedSnippet = await getSnippetsRepo().getOne(snippet.id);
-        updateDialogs(newSelectedSnippet);
-        renderSnippetEditor(snippetEditor, newSelectedSnippet);
+        selectSnippet(newSelectedSnippet, { renderSnippetList: false });
       });
       folderItems.appendChild(snippetItem);
     }
@@ -81,7 +77,9 @@ export async function renderSnippetList(
   }
 }
 
-export function updateSelectedSnippetItem(root: HTMLElement | null, selectedSnippet?: Snippet) {
+export function updateSelectedSnippetItem(selectedSnippet?: Snippet) {
+  const root = document.querySelector<HTMLDivElement>('#snippet-list');
+
   if (!root) {
     log.warn('No root element found for snippet list');
     return;

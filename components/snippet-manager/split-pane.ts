@@ -7,7 +7,9 @@ type MouseEventStore = {
 };
 
 // TODO: Store last position as percentage of total width and restore on load
-export function enableSplitPanelInteractivity(root: HTMLElement | null) {
+export function enableSplitPanelInteractivity() {
+  const root = document.querySelector<HTMLDivElement>('#snippet-manager > .split-panel-container');
+
   if (!root) {
     log.warn('No root element found for split pane interactivity');
     return;
