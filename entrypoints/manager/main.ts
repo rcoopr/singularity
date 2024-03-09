@@ -1,25 +1,18 @@
-import { enableSplitPaneInteractivity } from '@/components/snippet-manager/snippet-manager';
 import './styles.css';
+import { enableSplitPanelInteractivity } from '@/components/snippet-manager/split-pane';
 import { appendControls } from '@/components/quick-options/quick-options';
+import { initSnippetList } from '@/components/snippet-manager/snippet-list';
+import { initDialogs } from '../../components/snippet-manager/dialogs';
 
 const options = document.querySelector<HTMLDivElement>('#options');
-appendControls(options, ['theme']);
-enableSplitPaneInteractivity(
-  document.querySelector<HTMLDivElement>('#snippet-manager > .split-panel-container')
+export const snippetList = document.querySelector<HTMLDivElement>('#snippet-list');
+export const snippetEditor = document.querySelector<HTMLDivElement>('#snippet-editor');
+const splitPanel = document.querySelector<HTMLDivElement>(
+  '#snippet-manager > .split-panel-container'
 );
 
-// (async () => {
-//   const snippetsRepo = getSnippetsRepo();
-//   const all = await snippetsRepo.getAll();
+appendControls(options, ['theme']);
+initSnippetList(snippetList);
+enableSplitPanelInteractivity(splitPanel);
 
-//   const compositionSnippets = all.filter((s) => s.contexts.includes('composition'));
-//   const globalSnippets = all.filter((s) => s.contexts.includes('global'));
-//   const folders = [
-//     { name: 'Composition', snippets: compositionSnippets },
-//     { name: 'Global', snippets: globalSnippets },
-//   ];
-
-//   document.querySelector<HTMLDivElement>('#snippet-manager')!.appendChild(createBook().book);
-//   renderSidebar(folders, folders[0].snippets[0]);
-//   renderSnippet(folders[0].snippets[0]);
-// })();
+initDialogs();

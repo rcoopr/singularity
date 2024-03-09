@@ -48,6 +48,7 @@ button {
   font-family: inherit;
   background-color: theme('colors.zinc.800');
   cursor: pointer;
+  user-select: none;
 }
 
 button:hover {
@@ -55,7 +56,11 @@ button:hover {
 }
 
 button:focus,
-button:focus-visible {
+button:focus-visible,
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible {
   outline: 2px solid theme('colors.indigo.400');
   outline-offset: 2px;
 }
@@ -86,4 +91,8 @@ button.primary:hover {
 .label {
   font-weight: 600;
   margin-block-end: 0.25rem;
+}
+
+textarea {
+  scrollbar-width: thin;
 }

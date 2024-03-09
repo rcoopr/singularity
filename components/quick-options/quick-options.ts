@@ -24,8 +24,6 @@ export async function appendControls(
     return;
   }
 
-  root.classList.add('flex', 'flex-wrap', 'gap-4', 'my-8', 'items-end');
-
   const controls = await Promise.all(
     (selectedOptions ?? []).map(async (opt) => {
       return createOptionControls[opt]();

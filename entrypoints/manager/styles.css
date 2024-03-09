@@ -10,7 +10,7 @@
 
 .split-panel {
   height: 100%;
-  min-width: 100px;
+  min-width: 140px;
   border-radius: theme('borderRadius.md');
   display: flex;
   flex-direction: column;
@@ -50,20 +50,48 @@
   border-radius: 0.25rem;
   padding: 5px 10px;
   cursor: pointer;
-}
-
-.folder-item.selected.selected {
-  background-color: theme('colors.indigo.700');
-  border-radius: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .folder-item:hover {
   background-color: theme('colors.zinc.600');
-  border-radius: 0.25rem;
 }
 
 .folder-item:active {
   transform: translateY(1px);
+}
+
+.folder-items > li:last-child {
+  /* stops active styles overflowing */
+  margin-bottom: 1px;
+}
+
+.folder-item:focus,
+.folder-items .selected > button {
+  outline: none;
+  background: theme('colors.indigo.700');
+}
+
+.folder-items-container {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s;
+}
+
+.folder-items {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+}
+
+.folder.open .folder-items-container {
+  grid-template-rows: 1fr;
 }
 
 button.copy {
@@ -109,16 +137,16 @@ button.copied::before {
   opacity: 1;
 }
 
-button.add-snippet {
+#add-snippet {
   background-color: theme('colors.emerald.500');
   border-color: theme('colors.emerald.400');
   border-radius: theme('borderRadius.md');
   padding: theme('spacing[2]');
 }
-button.add-snippet:hover {
+#add-snippet:hover {
   background-color: theme('colors.emerald.600');
 }
-button.add-snippet:focus {
+#add-snippet:focus {
   outline: none;
   @apply ring-inset ring-2 ring-emerald-300;
 }
