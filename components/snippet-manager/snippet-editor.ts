@@ -22,6 +22,15 @@ export function renderSnippetEditor(root: HTMLElement | null, snippet?: Snippet)
 
   // render current snippet names in folders + set up listeners to keep it updated
   renderSnippetCode(root, snippet);
+  updateHeader(snippet);
+}
+
+function updateHeader(snippet: Snippet) {
+  const description = document.querySelector('#snippet-description');
+  if (!description) return;
+
+  description.innerHTML =
+    snippet.name || html`<span class="text-zinc-400 italic">No description</span>`;
 }
 
 async function renderSnippetCode(
