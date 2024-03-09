@@ -6,6 +6,7 @@ import { log } from '@/utils/log';
 
 type OptionName = keyof typeof options;
 
+// TODO: add bulk import/export/delete/restore to default options
 const createOptionControls: Record<OptionName, () => Promise<HTMLElement>> = {
   theme: createThemeControls,
 };

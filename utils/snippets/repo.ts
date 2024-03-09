@@ -19,19 +19,22 @@ export type Snippet = {
   code: string;
   desc?: string;
   lang?: 'javascript' | 'typescript' | 'html';
+  createdAt: number;
+  updatedAt?: number;
 };
 
 function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
   return {
     async create(snippet) {
       const id = nanoid();
-      const snippetWithId = { ...snippet, id };
-      await (await db).put('snippets', snippetWithId);
-      return snippetWithId;
+      const snippetWithMetadata = { ...snippet, id, createdAt: Date.now() };
+      await (await db).put('snippets', snippetWithMetadata);
+      return snippetWithMetadata;
     },
     async update(snippet) {
-      await (await db).put('snippets', snippet);
-      return snippet;
+      const updatedSnippet = { ...snippet, updatedAt: Date.now() };
+      await (await db).put('snippets', updatedSnippet);
+      return updatedSnippet;
     },
     async delete(id) {
       await (await db).delete('snippets', id);

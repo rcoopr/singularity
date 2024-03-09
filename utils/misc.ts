@@ -11,3 +11,8 @@ export async function writeToClipboard(text: string) {
   const data = [new ClipboardItem({ [type]: blob })];
   await navigator.clipboard.write(data);
 }
+
+export const dateFormat = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+});

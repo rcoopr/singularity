@@ -12,9 +12,11 @@
   <body class="justify-center min-h-screen">
     <div id="app" class="h-screen grid gap-4 grid-rows-[auto,1fr,auto] overflow-hidden">
       <header>
-        <h1 class="font-mono text-xl mb-2">Singularity</h1>
+        <div class="flex gap-4 items-baseline justify-between">
+          <h1 class="font-mono text-xl mb-2">Singularity</h1>
+          <h2 class="font-mono text-md mb-2 text-zinc-400">Snippet manager for Singular.live</h1>
+        </div>
         <hr class="border-zinc-600" />
-        <section id="options" class="flex flex-wrap gap-4 mt-6 mb-2 items-end"></section>
       </header>
       <main class="overflow-hidden">
         <section id="snippet-manager" class="h-full">
@@ -47,7 +49,10 @@
         </section>
         <!-- <section id="keybinds-manager"></section> -->
       </main>
-      <footer><p class="text-zinc-400 mt-4">Made by Ross Cooper</p></footer>
+      <footer class="flex gap-4 justify-between items-end">
+        <section id="options" class="flex flex-wrap gap-4 items-end"></section>
+        <p class="text-zinc-400 mt-4">Made by Ross Cooper</p>
+      </footer>
       <dialog id="add-snippet-dialog" data-trigger="add-snippet">
         <form method="dialog">
           <h1>Add Snippet</h1>

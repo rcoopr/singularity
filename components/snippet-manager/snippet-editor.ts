@@ -1,5 +1,5 @@
 import { Snippet } from '@/utils/snippets/repo';
-import { html, writeToClipboard } from '@/utils/misc';
+import { dateFormat, html, writeToClipboard } from '@/utils/misc';
 import { BundledTheme, codeToHtml } from 'shiki';
 import { options } from '@/utils/preferences/storage';
 
@@ -36,7 +36,7 @@ async function renderSnippetCode(
     return;
   }
 
-  const existingSnippet = root.querySelector('#snippet');
+  const existingSnippet = root.querySelector<HTMLDivElement>('#snippet');
   let snippetPreview = existingSnippet;
 
   if (!snippetPreview) {
@@ -61,9 +61,33 @@ async function renderSnippetCode(
   });
   snippetPreview.prepend(copyButton);
 
+  appendMetadata(snippetPreview, selectedSnippet);
   if (!existingSnippet) root.appendChild(snippetPreview);
 }
 
 export function updateEditorTheme(theme: BundledTheme) {
   renderSnippetCode(document.querySelector('#snippet-editor'), storedSnippet, theme);
+}
+
+function appendMetadata(root: HTMLElement, snippet: Snippet) {
+  const pre = root.querySelector('pre');
+  const color = pre?.style.color;
+  const backgroundColor = pre?.style.backgroundColor;
+
+  const metadata = document.createElement('div');
+  metadata.classList.add('metadata');
+  if (color) metadata.style.color = color;
+  if (backgroundColor) metadata.style.backgroundColor = backgroundColor;
+
+  if (snippet.updatedAt) {
+    metadata.innerHTML += html`<span class="snippet-date"
+      >Updated:<wbr /> ${dateFormat.format(snippet.updatedAt)}</span
+    >`;
+  }
+
+  metadata.innerHTML += html`
+    <span class="snippet-date">Created:<wbr /> ${dateFormat.format(snippet.createdAt)}</span>
+  `;
+
+  root.appendChild(metadata);
 }
