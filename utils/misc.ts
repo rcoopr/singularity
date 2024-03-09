@@ -4,3 +4,10 @@ export function toNumOr<F = undefined>(val: unknown, fallback?: F): number | F {
   const asNum = Number(val);
   return isNaN(asNum) ? (fallback as F) : asNum;
 }
+
+export async function writeToClipboard(text: string) {
+  const type = 'text/plain';
+  const blob = new Blob([text], { type });
+  const data = [new ClipboardItem({ [type]: blob })];
+  await navigator.clipboard.write(data);
+}

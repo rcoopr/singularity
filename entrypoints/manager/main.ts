@@ -14,5 +14,4 @@ const splitPanel = document.querySelector<HTMLDivElement>(
 appendControls(options, ['theme']);
 initSnippetList(snippetList);
 enableSplitPanelInteractivity(splitPanel);
-
 initDialogs();

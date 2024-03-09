@@ -5,9 +5,14 @@ import {
   groupSnippetsByContext,
   isSnippetContext,
 } from '@/utils/snippets/repo';
-import { snippetList } from '../../entrypoints/manager/main';
+import { snippetEditor, snippetList } from '../../entrypoints/manager/main';
+import { renderSnippetEditor } from '@/components/snippet-manager/snippet-editor';
 
+var isInitialized = false;
 export function initDialogs() {
+  if (isInitialized) return;
+  isInitialized = true;
+
   const snippetsRepo = getSnippetsRepo();
   const dialogs = document.querySelectorAll('dialog');
 
@@ -38,6 +43,7 @@ export function initDialogs() {
 
       renderSnippetList(snippetList, groupSnippetsByContext(await snippetsRepo.getAll()), snippet);
       updateDialogs(snippet);
+      renderSnippetEditor(snippetEditor, snippet);
 
       if (trigger.includes('add')) form.reset();
       dialog.close();

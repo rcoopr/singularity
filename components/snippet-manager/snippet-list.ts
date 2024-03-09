@@ -3,7 +3,11 @@ import { renderSnippetEditor } from '@/components/snippet-manager/snippet-editor
 import { snippetEditor } from '@/entrypoints/manager/main';
 import { Snippet, getSnippetsRepo, groupSnippetsByContext } from '@/utils/snippets/repo';
 
+var isInitialized = false;
 export async function initSnippetList(root: HTMLElement | null) {
+  if (isInitialized) return;
+  isInitialized = true;
+
   if (!root) {
     log.warn('No root element found for snippet list');
     return;
@@ -16,8 +20,8 @@ export async function initSnippetList(root: HTMLElement | null) {
   const selectedSnippet = snippets[0]?.snippets[0];
   renderSnippetList(root, snippets);
   updateSelectedSnippetItem(root, selectedSnippet);
-  updateDialogs(selectedSnippet);
   renderSnippetEditor(snippetEditor, selectedSnippet);
+  updateDialogs(selectedSnippet);
 }
 
 export async function renderSnippetList(
