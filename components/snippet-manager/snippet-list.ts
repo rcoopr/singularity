@@ -23,7 +23,7 @@ export async function initSnippetList() {
   selectSnippet(selectedSnippet);
 }
 
-export async function renderSnippetList(selectedSnippet?: Snippet) {
+export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
   const root = document.querySelector<HTMLDivElement>('#snippet-list');
 
   if (!root) {
@@ -77,7 +77,7 @@ export async function renderSnippetList(selectedSnippet?: Snippet) {
   }
 }
 
-export function updateSelectedSnippetItem(selectedSnippet?: Snippet) {
+export function updateSelectedSnippetItem(selectedSnippet: Snippet | undefined) {
   const root = document.querySelector<HTMLDivElement>('#snippet-list');
 
   if (!root) {

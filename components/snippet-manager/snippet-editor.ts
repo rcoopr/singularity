@@ -3,31 +3,21 @@ import { html, writeToClipboard } from '@/utils/misc';
 import { BundledTheme, codeToHtml } from 'shiki';
 import { options } from '@/utils/preferences/storage';
 
-export function renderSnippetEditor(snippet?: Snippet) {
+export function renderSnippetEditor(snippet: Snippet | undefined) {
   const root = document.querySelector<HTMLDivElement>('#snippet-editor');
 
   if (!root) {
     log.warn('No root element found for snippet editor');
     return;
   }
+
   updateHeader(snippet);
-
-  root.innerHTML = '';
-
-  if (!snippet) {
-    root.innerHTML = html`<p
-      class="w-full h-full rounded-md bg-gradient-to-b from-zinc-800 grid place-content-center text-base italic text-zinc-400"
-    >
-      No snippet selected
-    </p>`;
-    return;
-  }
 
   // render current snippet names in folders + set up listeners to keep it updated
   renderSnippetCode(root, snippet);
 }
 
-function updateHeader(snippet?: Snippet) {
+function updateHeader(snippet: Snippet | undefined) {
   const description = document.querySelector('#snippet-description');
   if (!description) return;
 
@@ -37,15 +27,21 @@ function updateHeader(snippet?: Snippet) {
 
 async function renderSnippetCode(
   root: HTMLElement,
-  selectedSnippet: Snippet,
+  selectedSnippet: Snippet | undefined,
   theme?: BundledTheme
 ) {
+  if (!selectedSnippet) {
+    root.innerHTML = html`<p class="snippet-editor-empty">No snippet selected</p>`;
+    return;
+  }
+
   const existingSnippet = root.querySelector('#snippet');
-  let snippet = existingSnippet;
-  if (!snippet) {
-    snippet = document.createElement('div');
-    snippet.id = 'snippet';
-    snippet.classList.add('h-full', 'animate-in', 'fade-in', 'relative', 'group');
+  let snippetPreview = existingSnippet;
+
+  if (!snippetPreview) {
+    snippetPreview = document.createElement('div');
+    snippetPreview.id = 'snippet';
+    snippetPreview.classList.add('h-full', 'animate-in', 'fade-in', 'relative', 'group');
   }
 
   const codeHtml = await codeToHtml(selectedSnippet.code, {
@@ -53,7 +49,7 @@ async function renderSnippetCode(
     theme: theme || (await options.theme.getValue()),
   });
 
-  snippet.innerHTML = codeHtml;
+  snippetPreview.innerHTML = codeHtml;
 
   const copyButton = document.createElement('button');
   copyButton.classList.add('copy', 'opacity-0', 'group-hover:opacity-100');
@@ -62,7 +58,7 @@ async function renderSnippetCode(
     copyButton.classList.add('copied');
     window.setTimeout(() => copyButton.classList.remove('copied'), 3000);
   });
-  snippet.prepend(copyButton);
+  snippetPreview.prepend(copyButton);
 
-  if (!existingSnippet) root.appendChild(snippet);
+  if (!existingSnippet) root.appendChild(snippetPreview);
 }

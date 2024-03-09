@@ -48,7 +48,7 @@ export function initDialogs() {
   }
 }
 
-export function updateDialogs(selectedSnippet?: Snippet) {
+export function updateDialogs(selectedSnippet: Snippet | undefined) {
   const dialogs = document.querySelectorAll('dialog');
   // TODO: handle radio buttons
   for (const dialog of dialogs) {

@@ -237,3 +237,16 @@ dialog button[type='reset'] {
 dialog #delete-snippet-form button[type='submit'] {
   background-color: theme('colors.rose.600');
 }
+
+.snippet-editor-empty {
+  width: 100%;
+  height: 100%;
+  border-radius: theme('borderRadius.md');
+  display: grid;
+  place-content: center;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: theme('colors.zinc.400');
+
+  @apply bg-gradient-to-b from-zinc-800;
+}
