@@ -3,15 +3,23 @@ import { websiteMessenger } from '@/utils/messenger/website';
 import { PublicPath } from 'wxt/browser';
 
 export default defineContentScript({
-  matches: ['*://*.google.com/*'],
+  matches: ['*://*.google.com/*', '*://app.singular.live/*'],
   main() {
-    console.log('Hello content.');
+    log.debug('Content script init');
     injectScript('/injected.js');
 
-    backgroundMessenger.onMessage('insert', (message) => {
-      console.log('insert (content <- background)', message);
+    // Injected -> Content Script
+    websiteMessenger.onMessage('context', (message) => {
+      backgroundMessenger.sendMessage('context', message.data);
+    });
 
-      console.log('insert (content -> injected)', message);
+    websiteMessenger.onMessage('cursorPosition', (message) => {
+      backgroundMessenger.sendMessage('cursorPosition', message.data);
+    });
+
+    // Background -> Content Script
+    backgroundMessenger.onMessage('insert', (message) => {
+      log.debug('insert (background -> content -> injected)', message);
       websiteMessenger.sendMessage('insert', message.data);
     });
   },
