@@ -1,4 +1,5 @@
 import { selectSnippet } from '@/components/snippet-manager/select-snippet';
+import { createIconStar } from '@/components/svg';
 import { Snippet, getSnippetsRepo, groupSnippetsByContext } from '@/utils/snippets/repo';
 
 var isInitialized = false;
@@ -52,22 +53,27 @@ export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
 
     // Create a list item for each snippet in the folder
     for (const snippet of folder.snippets) {
-      const snippetItem = document.createElement('li');
-      const snippetItemButton = document.createElement('button');
-      snippetItem.dataset.id = snippet.id;
-      snippetItemButton.classList.add('folder-item', 'w-full', 'text-left');
-      snippetItemButton.textContent = snippet.name;
-      snippetItem.appendChild(snippetItemButton);
+      const folderItem = document.createElement('li');
+      const folderItemButton = document.createElement('button');
+
+      folderItem.dataset.id = snippet.id;
+      folderItem.classList.add('folder-item');
+      folderItemButton.innerHTML = html`<span class="px-2 py-1">${snippet.name}</span>`;
+
+      folderItem.appendChild(folderItemButton);
+      folderItemButton.appendChild(createFavouriteCheckbox(snippet));
 
       if (selectedSnippet?.id === snippet.id) {
-        snippetItem.classList.add('selected');
+        folderItem.classList.add('selected');
       }
 
-      snippetItem.addEventListener('click', async () => {
+      folderItemButton.addEventListener('click', async (e) => {
+        e.stopPropagation();
         const newSelectedSnippet = await getSnippetsRepo().getOne(snippet.id);
         selectSnippet(newSelectedSnippet, { renderSnippetList: false });
       });
-      folderItems.appendChild(snippetItem);
+
+      folderItems.appendChild(folderItem);
     }
 
     folderContainer.appendChild(folderItemsContainer);
@@ -87,4 +93,25 @@ export function updateSelectedSnippetItem(selectedSnippet: Snippet | undefined) 
 
   const selectedSnippetItem = root.querySelector(`[data-id="${selectedSnippet?.id}"]`);
   selectedSnippetItem?.classList.add('selected');
+}
+
+function createFavouriteCheckbox(snippet: Snippet) {
+  const button = document.createElement('button');
+  button.classList.add('favourite');
+  button.dataset.checked = snippet.favourite ? 'true' : 'false';
+
+  button.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const currentTarget = e.currentTarget as HTMLButtonElement;
+    if (!currentTarget) return;
+
+    const wasFavourite = currentTarget.dataset.checked === 'true';
+    currentTarget.dataset.checked = wasFavourite ? 'false' : 'true';
+
+    await getSnippetsRepo().update(snippet.id, { favourite: !wasFavourite });
+  });
+
+  button.append(createIconStar());
+
+  return button;
 }

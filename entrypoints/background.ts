@@ -2,22 +2,29 @@ import { openExtensionDatabase } from '@/utils/db';
 import { backgroundMessenger } from '@/utils/messenger/background';
 import { capitalize } from '@/utils/misc';
 import { defaultSnippets } from '@/utils/snippets/default-snippets';
+import { createSemaphore } from '@/utils/semaphore';
 import {
   Snippet,
   SnippetContext,
   groupSnippetsByContext,
   registerSnippetsRepo,
 } from '@/utils/snippets/repo';
+import type { SetRequired } from 'type-fest';
 
 export default defineBackground(() => {
-  let contextMenuListenerAdded = false;
-  log.debug('Background script init');
+  const INSERT_SNIPPET_ID = 'insert-snippet';
+  type SnippetCreateArgs = [
+    SetRequired<Partial<Parameters<typeof browser.contextMenus.create>[0]>, 'id'>,
+    Snippet | string | number
+  ];
 
+  let contextMenuListenerAdded = false;
+  let contextMenuItemMap: Record<string, Snippet | string | number> = {};
+  let parentMenuCreated = false;
   let currentTab: number | undefined = undefined;
   const tabContexts: Record<number, SnippetContext | null> = {};
-
-  const idb = openExtensionDatabase();
-  const snippetsRepo = registerSnippetsRepo(idb);
+  const semaphore = createSemaphore();
+  log.debug('Background script init');
 
   backgroundMessenger.onMessage('snippetAdded', async () => {
     await createContextMenus();
@@ -30,6 +37,9 @@ export default defineBackground(() => {
   backgroundMessenger.onMessage('snippetDeleted', async () => {
     await createContextMenus();
   });
+
+  const idb = openExtensionDatabase();
+  const snippetsRepo = registerSnippetsRepo(idb);
 
   backgroundMessenger.onMessage('context', async (message) => {
     currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
@@ -51,95 +61,115 @@ export default defineBackground(() => {
     await createContextMenus();
   });
 
-  createContextMenus();
-
   browser.tabs.onActivated.addListener(async (info) => {
     currentTab = info.tabId;
     await createContextMenus();
   });
 
-  let contextMenuSnippetMap: Record<string, Snippet> = {};
-  let parentId: string | number | undefined = undefined;
+  // HMR will also trigger this
+  if (process.env.NODE_ENV === 'development') createContextMenus();
+
   async function createContextMenus() {
-    const [all, _] = await Promise.all([
-      await snippetsRepo.getAll(),
-      await browser.contextMenus.removeAll(),
-    ]);
+    // Queue multiple calls to this function
+    await semaphore.acquire();
 
-    const groupedSnippets = groupSnippetsByContext(all);
-    const currentContext = currentTab ? tabContexts[currentTab] : null;
-    const currentContextGroups = groupedSnippets.find((group) => group.context === currentContext);
-    const contextualGroups = currentContext ? [currentContextGroups] : groupedSnippets;
+    try {
+      const [all] = await Promise.all([
+        (await snippetsRepo.getAll()).filter((snippet) => snippet.favourite),
+        await browser.contextMenus.removeAll(),
+      ]);
+      contextMenuItemMap = {};
+      parentMenuCreated = false;
 
-    parentId = undefined;
-    contextMenuSnippetMap = {};
+      const groupedSnippets = groupSnippetsByContext(all);
+      const currentContext = currentTab ? tabContexts[currentTab] : null;
+      const currentContextGroups = groupedSnippets.find(
+        (group) => group.context === currentContext
+      );
+      const contextualGroups = currentContext ? [currentContextGroups] : groupedSnippets;
 
-    contextualGroups.forEach((group, i) => {
-      if (!group || !group.snippets) return;
-      const { context, snippets } = group;
+      const subMenuItems: SnippetCreateArgs[] = [];
 
-      if (!parentId) {
-        parentId = browser.contextMenus.create({
-          id: 'insert-snippet',
-          title: 'Insert Snippet',
-          contexts: ['editable'],
-        });
-      }
+      for (const group of contextualGroups) {
+        if (!group || !group.snippets) return;
+        const { context, snippets } = group;
 
-      if (i > 0) {
-        browser.contextMenus.create({
-          type: 'separator',
-          parentId,
-          id: context,
-          contexts: ['editable'],
-        });
-      }
-      browser.contextMenus.create({
-        enabled: false,
-        parentId,
-        id: `${context}-header`,
-        title: capitalize(context),
-        contexts: ['editable'],
-      });
+        if (!parentMenuCreated) {
+          browser.contextMenus.create(
+            {
+              id: INSERT_SNIPPET_ID,
+              title: 'Insert Snippet',
+              contexts: ['editable'],
+            },
+            () => {
+              browser.runtime.lastError &&
+                log.debug('Error creating context menu', browser.runtime.lastError);
+            }
+          );
+          parentMenuCreated = true;
+        }
 
-      if (snippets) {
-        for (const snippet of snippets) {
-          const menuItemId = browser.contextMenus.create({
-            parentId,
-            id: snippet.id,
-            title: snippet.name,
-            contexts: ['editable'],
-          });
-          contextMenuSnippetMap[menuItemId] = snippet;
+        if (subMenuItems.length > 0)
+          subMenuItems.push([{ id: context, type: 'separator' }, context]);
+
+        subMenuItems.push([
+          { id: `${context}-header`, title: capitalize(context), enabled: false },
+          `${context}-header`,
+        ]);
+
+        for (const snippet of snippets ?? []) {
+          subMenuItems.push([{ id: snippet.id, title: snippet.name }, snippet]);
         }
       }
-    });
 
-    if (Object.keys(contextMenuSnippetMap).length === 0) {
-      browser.contextMenus.create({
-        id: 'no-snippets',
-        title: 'No snippets available',
-        enabled: false,
-        contexts: ['editable'],
-      });
-    }
+      await Promise.all(subMenuItems.map((args) => createMenuItem(...args)));
 
-    if (!contextMenuListenerAdded) {
-      browser.contextMenus.onClicked.addListener((info, tab) => {
-        log.debug('contextMenus.onClicked', info, tab);
-        // message to content script to execute paste
-        if (tab && info.parentMenuItemId === parentId) {
-          // handle paste/insert snippet
-          const snippet = contextMenuSnippetMap[info.menuItemId];
-          if (!snippet) {
-            log.warn('Matching snippet was not found', info.menuItemId, contextMenuSnippetMap);
-            return;
+      if (!contextMenuListenerAdded) {
+        browser.contextMenus.onClicked.addListener((info, tab) => {
+          log.debug('contextMenus.onClicked', contextMenuItemMap, tab?.id);
+          // message to content script to execute paste
+          if (tab && info.parentMenuItemId === INSERT_SNIPPET_ID) {
+            const snippet = contextMenuItemMap[info.menuItemId];
+            if (typeof snippet !== 'object') return;
+
+            // handle paste/insert snippet
+            if (!snippet) {
+              log.warn('Matching snippet was not found', info.menuItemId, contextMenuItemMap);
+              return;
+            }
+            log.debug('send insert message', snippet.code, tab.id);
+            backgroundMessenger.sendMessage('insert', snippet.code, tab.id);
           }
-          log.debug('send insert message', snippet.code, tab.id);
-          backgroundMessenger.sendMessage('insert', snippet.code, tab.id);
-        }
-      });
-      contextMenuListenerAdded = true;
+        });
+        contextMenuListenerAdded = true;
+      }
+    } finally {
+      semaphore.release();
     }
+  }
+
+  async function createMenuItem(args: SnippetCreateArgs[0], snippet?: SnippetCreateArgs[1]) {
+    const entryInMap = contextMenuItemMap[args.id];
+    contextMenuItemMap[args.id] = snippet || args.id;
+
+    return new Promise<string>((resolve, reject) => {
+      if (entryInMap) resolve(args.id);
+
+      browser.contextMenus.create(
+        {
+          parentId: INSERT_SNIPPET_ID,
+          contexts: ['editable'],
+          ...args,
+        },
+        () => {
+          if (browser.runtime.lastError) {
+            log.warn('Error creating context menu', browser.runtime.lastError, contextMenuItemMap);
+            reject(browser.runtime.lastError);
+          } else {
+            resolve(args.id);
+          }
+        }
+      );
+    });
   }
 });

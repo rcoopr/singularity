@@ -3,6 +3,7 @@ import { IDBPDatabase } from 'idb';
 import { nanoid } from 'nanoid';
 import type { SetOptional } from 'type-fest';
 import groupBy from 'object.groupby';
+import { backgroundMessenger } from '@/utils/messenger/background';
 
 export type SnippetsRepo = {
   createOrUpdate(snippet: SnippetInput): Promise<Snippet | undefined>;
@@ -45,9 +46,10 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         await (await db).put('snippets', snippetWithDefaults);
       } catch (e) {
         log.warn('Failed to add snippet', e);
-        return undefined;
+        return;
       }
 
+      void backgroundMessenger.sendMessage('snippetAdded', snippetWithDefaults);
       return snippetWithDefaults;
     },
     async update(id, properties) {
@@ -56,7 +58,7 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         snippet = await (await db).get('snippets', id);
       } catch (e) {
         log.warn(`Failed to update snippet (Couldn't retrieve snippet)`, e);
-        return undefined;
+        return;
       }
 
       const updatedSnippet = {
@@ -68,13 +70,20 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         await (await db).put('snippets', updatedSnippet);
       } catch (e) {
         log.warn(`Failed to update snippet (Couldn't update snippet)`, e);
-        return undefined;
+        return;
       }
 
+      void backgroundMessenger.sendMessage('snippetUpdated', updatedSnippet);
       return updatedSnippet;
     },
     async delete(id) {
-      await (await db).delete('snippets', id);
+      try {
+        await (await db).delete('snippets', id);
+      } catch (e) {
+        log.warn(`Failed to delete snippet`, e);
+        return;
+      }
+      void backgroundMessenger.sendMessage('snippetDeleted', { id });
     },
     async getOne(id) {
       return await (await db).get('snippets', id);

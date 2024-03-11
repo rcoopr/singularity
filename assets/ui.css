@@ -55,6 +55,10 @@ button:hover {
   border-color: theme('colors.indigo.500');
 }
 
+button:active {
+  transform: translateY(1px);
+}
+
 button:focus,
 button:focus-visible,
 input:focus,
