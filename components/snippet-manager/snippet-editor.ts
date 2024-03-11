@@ -2,6 +2,7 @@ import { Snippet } from '@/utils/snippets/repo';
 import { dateFormat, html, writeToClipboard } from '@/utils/misc';
 import { BundledTheme, codeToHtml } from 'shiki';
 import { options } from '@/utils/preferences/storage';
+import { updatePageTheme, langAbbreviations } from '@/utils/misc';
 
 export function renderSnippetEditor(snippet: Snippet | undefined) {
   const root = document.querySelector<HTMLDivElement>('#snippet-editor');
@@ -26,6 +27,7 @@ async function renderSnippetCode(
   theme?: BundledTheme
 ) {
   storedSnippet = selectedSnippet;
+  theme = theme || (await options.theme.getValue());
   if (!root) {
     log.warn('No root element found for snippet editor');
     return;
@@ -33,6 +35,7 @@ async function renderSnippetCode(
 
   if (!selectedSnippet) {
     root.innerHTML = html`<p class="snippet-editor-empty">No snippet selected</p>`;
+    updatePageTheme(theme);
     return;
   }
 
@@ -47,7 +50,7 @@ async function renderSnippetCode(
 
   const codeHtml = await codeToHtml(selectedSnippet.code, {
     lang: selectedSnippet.lang || 'javascript',
-    theme: theme || (await options.theme.getValue()),
+    theme,
   });
 
   snippetPreview.innerHTML = codeHtml;
@@ -63,10 +66,11 @@ async function renderSnippetCode(
 
   appendMetadata(snippetPreview, selectedSnippet);
   if (!existingSnippet) root.appendChild(snippetPreview);
+  updatePageTheme(theme);
 }
 
-export function updateEditorTheme(theme: BundledTheme) {
-  renderSnippetCode(document.querySelector('#snippet-editor'), storedSnippet, theme);
+export async function updateEditorTheme(theme: BundledTheme) {
+  await renderSnippetCode(document.querySelector('#snippet-editor'), storedSnippet, theme);
 }
 
 function appendMetadata(root: HTMLElement, snippet: Snippet) {
@@ -88,6 +92,21 @@ function appendMetadata(root: HTMLElement, snippet: Snippet) {
   metadata.innerHTML += html`
     <span class="snippet-date">Created:<wbr /> ${dateFormat.format(snippet.createdAt)}</span>
   `;
+
+  const langIndicator = document.createElement('div');
+  langIndicator.classList.add(
+    'absolute',
+    'm-3',
+    'bottom-full',
+    'right-0',
+    'text-sm',
+    'font-bold',
+    'not-italic',
+    'text-gray-400',
+    'opacity-50'
+  );
+  langIndicator.textContent = langAbbreviations[snippet.lang || 'javascript'];
+  metadata.appendChild(langIndicator);
 
   root.appendChild(metadata);
 }

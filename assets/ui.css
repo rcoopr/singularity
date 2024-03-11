@@ -4,9 +4,6 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -15,19 +12,25 @@
 }
 
 a {
-  font-weight: 500;
-  color: #646cff;
-  color: theme('colors.indigo.600');
-  text-decoration: inherit;
+  /* font-weight: 500; */
+  /* color: theme('colors.indigo.600'); */
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 a:hover {
-  color: theme('colors.indigo.500');
+  /* color: theme('colors.indigo.500'); */
+  text-underline-offset: 3px;
 }
 
 body {
   margin: 0;
   display: flex;
   min-width: 320px;
+  color: theme('colors.zinc.800');
+  background-color: theme('colors.zinc.300');
+}
+body:where(.dark) {
+  color: theme('colors.zinc.100');
   background-color: theme('colors.zinc.900');
 }
 
@@ -35,24 +38,31 @@ body {
   width: 100%;
   padding: 2rem;
   max-width: 1280px;
-
-  /* hacky fix for strange overflow behaviour on body */
 }
 
 button {
+  border: 1px solid theme('colors.zinc.200');
+  background-color: theme('colors.zinc.300');
   border-radius: 0.25rem;
-  border: 1px solid theme('colors.zinc.700');
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: theme('colors.zinc.800');
   cursor: pointer;
   user-select: none;
 }
+body:where(.dark) button {
+  border-color: theme('colors.zinc.700');
+  background-color: theme('colors.zinc.800');
+}
 
 button:hover {
+  border-color: theme('colors.indigo.300');
+  background-color: theme('colors.zinc.100');
+}
+body:where(.dark) button:hover {
   border-color: theme('colors.indigo.500');
+  background-color: theme('colors.zinc.900');
 }
 
 button:active {
@@ -73,23 +83,17 @@ button.primary {
   background: theme('colors.indigo.600');
   width: 100%;
   border: 1px solid theme('colors.indigo.500');
+  color: theme('colors.zinc.100');
+}
+body:where(.dark) button.primary {
+  background: theme('colors.indigo.600');
+  border-color: theme('colors.indigo.500');
+  color: inherit;
 }
 
-button.primary:hover {
+button.primary:hover,
+body:where(.dark) button.primary:hover {
   background: theme('colors.indigo.700');
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: theme('colors.indigo.700');
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }
 
 .label {
@@ -99,4 +103,19 @@ button.primary:hover {
 
 textarea {
   scrollbar-width: thin;
+}
+
+pre:focus {
+  outline: none;
+}
+#snippet:focus-within {
+  position: relative;
+}
+#snippet:has(pre:focus)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  outline: 2px solid theme('colors.indigo.400');
+  outline-offset: 1px;
+  border-radius: theme('borderRadius.md');
 }

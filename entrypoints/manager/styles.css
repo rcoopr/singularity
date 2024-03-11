@@ -23,7 +23,7 @@
 }
 
 .folder-header {
-  background-color: theme('colors.zinc.900');
+  background-color: theme('colors.zinc.100');
   border-radius: 0.25rem;
   padding: 5px 10px;
   font-weight: bold;
@@ -31,6 +31,9 @@
   margin-bottom: 0.25rem;
   position: relative;
   text-transform: capitalize;
+}
+body:where(.dark) .folder-header {
+  background-color: theme('colors.zinc.900');
 }
 
 .folder-header::after {
@@ -70,18 +73,25 @@
   margin-bottom: 1px;
 }
 
+.folder-item:focus {
+  outline: 2px solid theme('colors.indigo.400');
+  outline-offset: -2px;
+}
 .folder-item > button {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   text-align: left;
-  background-color: theme('colors.zinc.700');
   padding: 0;
   cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  background-color: theme('colors.zinc.300');
+}
+body:where(.dark) .folder-item > button {
+  background-color: theme('colors.zinc.700');
 }
 .folder-item > button:hover {
   z-index: 2;
@@ -96,7 +106,14 @@
   outline: none;
   background: theme('colors.indigo.700');
   border-color: transparent;
+  color: theme('colors.zinc.100');
 }
+body:where(.dark) .folder-item > button:focus,
+body:where(.dark) .folder-item.selected > button {
+  color: inherit;
+  background: theme('colors.indigo.700');
+}
+.folder-item > button:focus,
 .folder-item > button:focus:hover,
 .folder-item.selected > button:hover {
   border-color: theme('colors.indigo.500');
@@ -108,24 +125,29 @@
 .favourite {
   opacity: 0;
   padding: 0.25rem;
+  margin: 2px;
+  border-radius: theme('borderRadius.DEFAULT');
   border: none;
   background: transparent;
-  color: theme('colors.zinc.300');
-  @apply transition-opacity;
+  color: theme('colors.yellow.300');
+  @apply transition-all;
+}
+.favourite:hover {
+  background: theme('colors.indigo.500');
 }
 .favourite:focus {
   outline: none;
+  opacity: 1;
+  color: theme('colors.yellow.300');
+  background: theme('colors.indigo.500');
 }
 .favourite:active {
   transform: translateY(0) scale(1.1);
 }
 
 .favourite .star {
-  width: 1rem;
-  height: 1rem;
-}
-.favourite .star .stroke {
-  opacity: 1;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 .favourite .star .fill {
   opacity: 0.2;
@@ -143,16 +165,20 @@ button.copy {
   top: 0.75rem;
   right: 0.75rem;
   z-index: 3;
-  border: 1px solid theme('colors.zinc.700');
   width: 2.5rem;
   height: 2.5rem;
-  background-color: theme('colors.zinc.900');
   cursor: pointer;
   background-image: var(--vp-icon-copy);
   background-position: 50%;
   background-size: 20px;
   background-repeat: no-repeat;
   transition: border-color 0.25s, background-color 0.25s, opacity 0.25s;
+  border: 1px solid theme('colors.zinc.300');
+  background-color: theme('colors.zinc.100');
+}
+body:where(.dark) button.copy {
+  border-color: theme('colors.zinc.700');
+  background-color: theme('colors.zinc.900');
 }
 
 button.copied {
@@ -167,12 +193,16 @@ button.copy::before {
   transform: translateY(-50%);
   right: calc(100% + 0.5rem);
   padding: 0.25rem 0.5rem;
-  border: 1px solid theme('colors.zinc.700');
-  background-color: theme('colors.zinc.900');
   border-radius: 0.25rem;
   opacity: 0;
   transition: opacity 0.25s;
   pointer-events: none;
+  border: 1px solid theme('colors.zinc.300');
+  background-color: theme('colors.zinc.100');
+}
+body:where(.dark) button.copy::before {
+  border-color: theme('colors.zinc.700');
+  background-color: theme('colors.zinc.900');
 }
 
 button.copied::before {
@@ -182,15 +212,20 @@ button.copied::before {
 #add-snippet {
   background-color: theme('colors.emerald.500');
   border-color: theme('colors.emerald.400');
+  color: theme('colors.zinc.900');
+  font-weight: bold;
   border-radius: theme('borderRadius.md');
   padding: theme('spacing[2]');
 }
 #add-snippet:hover {
+  background-color: theme('colors.emerald.400');
+}
+body:where(.dark) #add-snippet:hover {
   background-color: theme('colors.emerald.600');
 }
 #add-snippet:focus {
-  outline: none;
-  @apply ring-inset ring-2 ring-emerald-300;
+  outline: 2px solid theme('colors.emerald.900');
+  outline-offset: -4px;
 }
 
 dialog {
@@ -198,8 +233,16 @@ dialog {
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   padding: 2rem;
+  backdrop-filter: blur(10px);
+  background: rgba(244, 244, 245, 0.3);
+  color: theme('colors.zinc.700');
   /* max-width: 400px; */
   /* background-color: #fff; */
+}
+body:where(.dark) dialog {
+  /* background: theme('colors.zinc.900'); */
+  background: rgba(24, 24, 27, 0.2);
+  color: theme('colors.zinc.100');
 }
 
 dialog::backdrop {
@@ -241,10 +284,14 @@ dialog input[type='text'],
 dialog textarea {
   width: 100%;
   padding: 8px;
-  background: theme('colors.zinc.800');
+  background: theme('colors.zinc.200');
   /* border: 1px solid #ccc; */
   border-radius: 4px;
   box-sizing: border-box;
+}
+body:where(.dark) dialog input[type='text'],
+body:where(.dark) dialog textarea {
+  background: theme('colors.zinc.800');
 }
 
 dialog textarea {
@@ -271,13 +318,20 @@ dialog button {
 dialog button[type='submit'] {
   background-color: theme('colors.emerald.600');
 }
-
+dialog button[type='submit']:hover {
+  background-color: theme('colors.emerald.700');
+}
 dialog button[type='reset'] {
   background-color: theme('colors.zinc.600');
 }
-
+dialog button[type='reset']:hover {
+  background-color: theme('colors.zinc.700');
+}
 dialog #delete-snippet-form button[type='submit'] {
   background-color: theme('colors.rose.600');
+}
+dialog #delete-snippet-form button[type='submit']:hover {
+  background-color: theme('colors.rose.700');
 }
 
 .snippet-editor-empty {
@@ -288,28 +342,30 @@ dialog #delete-snippet-form button[type='submit'] {
   place-content: center;
   font-size: 1.25rem;
   font-style: italic;
-  color: theme('colors.zinc.400');
+  color: theme('colors.zinc.600');
 
+  @apply bg-gradient-to-b from-zinc-100;
+}
+body:where(.dark) .snippet-editor-empty {
+  color: theme('colors.zinc.400');
   @apply bg-gradient-to-b from-zinc-800;
 }
 
 #snippet-editor pre {
   position: relative;
 }
-
-#snippet-editor pre::before,
-#snippet-editor .metadata::before {
+#snippet-editor pre::after,
+#snippet-editor .metadata::after {
   border-color: black;
   opacity: 0.2;
 }
-#snippet-editor pre::after,
-#snippet-editor .metadata::after {
+body:where(.dark) #snippet-editor pre::after,
+body:where(.dark) #snippet-editor .metadata::after {
+  opacity: 0.8;
   border-color: white;
   mix-blend-mode: overlay;
 }
-#snippet-editor pre::before,
 #snippet-editor pre::after,
-#snippet-editor .metadata::before,
 #snippet-editor .metadata::after {
   content: '';
   position: absolute;
@@ -321,12 +377,10 @@ dialog #delete-snippet-form button[type='submit'] {
   border-style: solid;
   z-index: 1;
 }
-#snippet-editor pre::before,
 #snippet-editor pre::after {
   border-width: 1px;
   border-radius: theme('borderRadius.md');
 }
-#snippet-editor .metadata::before,
 #snippet-editor .metadata::after {
   border-top-width: 1px;
 }

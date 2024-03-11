@@ -11,12 +11,16 @@
 .radio-group label {
   display: inline-block;
   padding: 0.6em 1.2em;
-  border: 1px solid theme('colors.zinc.700');
+  border: 1px solid theme('colors.zinc.300');
   cursor: pointer;
   transition: background-color 0.25s;
-  background: theme('colors.zinc.800');
+  background: theme('colors.zinc.200');
   margin-right: -1px;
   user-select: none;
+}
+body:where(.dark) .radio-group label {
+  border-color: theme('colors.zinc.700');
+  background: theme('colors.zinc.800');
 }
 .radio-group label:first-of-type {
   border-radius: 0.25rem 0 0 0.25rem;
@@ -27,23 +31,34 @@
 }
 .radio-group label:hover {
   z-index: 2;
+  border-color: theme('colors.indigo.600');
+}
+body:where(.dark) .radio-group label:hover {
   border-color: theme('colors.indigo.500');
 }
 .radio-group input:checked + label {
   z-index: 1;
+  background: theme('colors.indigo.600');
+  border-color: theme('colors.indigo.900');
+  color: theme('colors.zinc.100');
+}
+body:where(.dark) .radio-group input:checked + label {
   background: theme('colors.indigo.800');
   border-color: theme('colors.indigo.500');
-  color: theme('colors.white');
 }
 
 .select {
+  border: 1px solid theme('colors.zinc.400');
+  background: theme('colors.zinc.200');
   font-size: 1rem;
   border-radius: 0.25rem;
-  border: 1px solid theme('colors.zinc.700');
-  background: theme('colors.zinc.800');
   padding: 5px;
 }
 .select:focus {
-  border-color: theme('colors.indigo.500');
-  outline: none;
+  outline: 2px solid theme('colors.indigo.400');
+  outline-offset: 2px;
+}
+body:where(.dark) .select {
+  border-color: theme('colors.zinc.700');
+  background: theme('colors.zinc.800');
 }

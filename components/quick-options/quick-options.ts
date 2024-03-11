@@ -39,7 +39,7 @@ async function createThemeControls() {
   container.classList.add('flex', 'flex-col', 'grow');
   container.innerHTML = html`
     <label for="color-theme" class="label">Color Theme</label>
-    <select id="color-theme" class="select max-w-max">
+    <select id="color-theme" class="select sm:max-w-max">
       ${createThemeOptionGroups()}
     </select>
   `;
