@@ -2,7 +2,8 @@
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
     "strict": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "exactOptionalPropertyTypes": true
   },
   "includes": ["./*.d.ts"]
 }

@@ -45,7 +45,7 @@ export default defineBackground(() => {
   // TODO: replace with prompt in sidebar if empty. Good for dev though
   browser.runtime.onInstalled.addListener(async (details) => {
     if (!details.previousVersion) {
-      await Promise.all(defaultSnippets.map((snippet) => snippetsRepo.create(snippet)));
+      await Promise.all(defaultSnippets.map((snippet) => snippetsRepo.createOrUpdate(snippet)));
     }
 
     await createContextMenus();

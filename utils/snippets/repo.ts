@@ -1,39 +1,76 @@
 import { defineProxyService } from '@webext-core/proxy-service';
 import { IDBPDatabase } from 'idb';
 import { nanoid } from 'nanoid';
+import type { SetOptional } from 'type-fest';
 import groupBy from 'object.groupby';
 
 export type SnippetsRepo = {
-  create(snippet: SnippetInput): Promise<Snippet>;
-  update(snippet: Snippet): Promise<Snippet>;
+  createOrUpdate(snippet: SnippetInput): Promise<Snippet | undefined>;
+  update(id: Snippet['id'], snippet: SnippetUpdate): Promise<Snippet | undefined>;
   delete(id: Snippet['id']): Promise<void>;
   getOne(id: Snippet['id']): Promise<Snippet>;
   getAll(): Promise<Snippet[]>;
 };
 
-export type SnippetInput = Omit<Snippet, 'id'>;
 export type Snippet = {
   id: string;
   name: string;
   context: SnippetContext;
   code: string;
   desc?: string;
-  lang?: 'javascript' | 'typescript' | 'html';
+  lang: 'javascript' | 'typescript' | 'html';
+  favourite: boolean;
   createdAt: number;
   updatedAt?: number;
 };
+export type SnippetInput = SetOptional<
+  Omit<Snippet, 'id' | 'createdAt' | 'updatedAt'>,
+  'favourite' | 'lang'
+>;
+export type SnippetUpdate = Partial<Omit<Snippet, 'id' | 'createdAt' | 'updatedAt'>>;
 
 function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
   return {
-    async create(snippet) {
+    async createOrUpdate(snippet) {
       const id = nanoid();
-      const snippetWithMetadata = { ...snippet, id, createdAt: Date.now() };
-      await (await db).put('snippets', snippetWithMetadata);
-      return snippetWithMetadata;
+      const snippetWithDefaults = {
+        ...snippet,
+        id,
+        createdAt: Date.now(),
+        favourite: !!snippet.favourite,
+        lang: snippet.lang || 'javascript',
+      };
+
+      try {
+        await (await db).put('snippets', snippetWithDefaults);
+      } catch (e) {
+        log.warn('Failed to add snippet', e);
+        return undefined;
+      }
+
+      return snippetWithDefaults;
     },
-    async update(snippet) {
-      const updatedSnippet = { ...snippet, updatedAt: Date.now() };
-      await (await db).put('snippets', updatedSnippet);
+    async update(id, properties) {
+      let snippet: Snippet;
+      try {
+        snippet = await (await db).get('snippets', id);
+      } catch (e) {
+        log.warn(`Failed to update snippet (Couldn't retrieve snippet)`, e);
+        return undefined;
+      }
+
+      const updatedSnippet = {
+        ...snippet,
+        ...properties,
+        updatedAt: Date.now(),
+      };
+      try {
+        await (await db).put('snippets', updatedSnippet);
+      } catch (e) {
+        log.warn(`Failed to update snippet (Couldn't update snippet)`, e);
+        return undefined;
+      }
+
       return updatedSnippet;
     },
     async delete(id) {

@@ -60,7 +60,8 @@ export function updateDialogs(selectedSnippet: Snippet | undefined) {
           return;
         }
 
-        input.value = selectedSnippet[input.name as keyof Snippet] || '';
+        // TODO - maybe causes issues with booleans etc
+        input.value = selectedSnippet[input.name as keyof Snippet]?.toString() || '';
       });
       const codeInput = dialog.querySelector('textarea');
       if (codeInput && selectedSnippet) {
@@ -83,7 +84,7 @@ async function addSnippetFormHandler(formData: FormData) {
   const context = isSnippetContext(contextStr) ? contextStr : 'composition';
 
   const snippetsRepo = getSnippetsRepo();
-  return await snippetsRepo.create({ name, code, desc, context });
+  return await snippetsRepo.createOrUpdate({ name, code, desc, context });
 }
 
 async function editSnippetFormHandler(formData: FormData) {
@@ -99,7 +100,7 @@ async function editSnippetFormHandler(formData: FormData) {
   const context = isSnippetContext(contextStr) ? contextStr : 'composition';
 
   const snippetsRepo = getSnippetsRepo();
-  return await snippetsRepo.update({ id, name, code, desc, context });
+  return await snippetsRepo.update(id, { name, code, desc, context });
 }
 
 async function deleteSnippetFormHandler(formData: FormData) {
