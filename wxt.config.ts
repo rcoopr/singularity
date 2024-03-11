@@ -3,7 +3,10 @@ import { defineConfig } from 'wxt';
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   runner: {
-    startUrls: ['https://www.google.com/', 'https://app.singular.live/compositions/484605/script'],
+    startUrls: [
+      'https://www.google.com/',
+      // 'https://app.singular.live/compositions/484605/script'
+    ],
   },
   manifest: {
     web_accessible_resources: [

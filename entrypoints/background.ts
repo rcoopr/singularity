@@ -7,10 +7,10 @@ import {
   SnippetContext,
   groupSnippetsByContext,
   registerSnippetsRepo,
-  snippetContexts,
 } from '@/utils/snippets/repo';
 
 export default defineBackground(() => {
+  let contextMenuListenerAdded = false;
   log.debug('Background script init');
 
   let currentTab: number | undefined = undefined;
@@ -34,7 +34,8 @@ export default defineBackground(() => {
   backgroundMessenger.onMessage('context', async (message) => {
     currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
     if (currentTab) tabContexts[currentTab] = message.data;
-    createContextMenus();
+    log.debug('Context:', message.data, currentTab);
+    await createContextMenus();
   });
 
   backgroundMessenger.onMessage('cursorPosition', async (message) => {
@@ -44,33 +45,39 @@ export default defineBackground(() => {
   // TODO: replace with prompt in sidebar if empty. Good for dev though
   browser.runtime.onInstalled.addListener(async (details) => {
     if (!details.previousVersion) {
-      for (const snippet of defaultSnippets) {
-        snippetsRepo.create(snippet);
-      }
+      await Promise.all(defaultSnippets.map((snippet) => snippetsRepo.create(snippet)));
     }
+
+    await createContextMenus();
   });
 
-  createContextMenus({ addEventListener: true });
+  createContextMenus();
 
-  browser.tabs.onActivated.addListener((info) => {
+  browser.tabs.onActivated.addListener(async (info) => {
     currentTab = info.tabId;
-    createContextMenus();
+    await createContextMenus();
   });
 
-  async function createContextMenus(opts?: { addEventListener?: boolean }) {
+  let contextMenuSnippetMap: Record<string, Snippet> = {};
+  let parentId: string | number | undefined = undefined;
+  async function createContextMenus() {
     const [all, _] = await Promise.all([
       await snippetsRepo.getAll(),
       await browser.contextMenus.removeAll(),
     ]);
 
     const groupedSnippets = groupSnippetsByContext(all);
-    const contextMenuSnippetMap: Record<string, Snippet> = {};
     const currentContext = currentTab ? tabContexts[currentTab] : null;
-    const contexts = currentContext ? [currentContext] : snippetContexts;
+    const currentContextGroups = groupedSnippets.find((group) => group.context === currentContext);
+    const contextualGroups = currentContext ? [currentContextGroups] : groupedSnippets;
 
-    let parentId: string | number | undefined = undefined;
-    groupedSnippets.forEach(({ context, snippets }, i) => {
-      if (!snippets) return;
+    parentId = undefined;
+    contextMenuSnippetMap = {};
+
+    contextualGroups.forEach((group, i) => {
+      if (!group || !group.snippets) return;
+      const { context, snippets } = group;
+
       if (!parentId) {
         parentId = browser.contextMenus.create({
           id: 'insert-snippet',
@@ -117,8 +124,9 @@ export default defineBackground(() => {
       });
     }
 
-    if (opts?.addEventListener) {
+    if (!contextMenuListenerAdded) {
       browser.contextMenus.onClicked.addListener((info, tab) => {
+        log.debug('contextMenus.onClicked', info, tab);
         // message to content script to execute paste
         if (tab && info.parentMenuItemId === parentId) {
           // handle paste/insert snippet
@@ -131,6 +139,7 @@ export default defineBackground(() => {
           backgroundMessenger.sendMessage('insert', snippet.code, tab.id);
         }
       });
+      contextMenuListenerAdded = true;
     }
   }
 });
