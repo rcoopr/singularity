@@ -62,10 +62,14 @@ async function renderSnippetCode(
   const copyButton = document.createElement('button');
   copyButton.classList.add('copy', 'opacity-0', 'group-hover:opacity-100');
   copyButton.addEventListener('click', async () => {
-    const code =
-      selectedSnippet.lang === 'typescript'
-        ? transpile(selectedSnippet.code)
-        : selectedSnippet.code;
+    let code = selectedSnippet.code;
+    if (selectedSnippet.lang === 'typescript') {
+      code = transpile(code);
+      copyButton.style.setProperty('--content', '"Transpiled & copied!"');
+    } else {
+      copyButton.style.setProperty('--content', '"Copied!"');
+    }
+
     await writeToClipboard(code);
     log.debug('Write to clipboard:\n', code);
     copyButton.classList.add('copied');

@@ -40,7 +40,7 @@ export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
     folderContainer.classList.add('folder', 'open');
 
     const folderHeader = document.createElement('div');
-    folderHeader.classList.add('folder-header');
+    folderHeader.classList.add('folder-header', 'bg-bg');
     folderHeader.textContent = folder.context;
     folderHeader.addEventListener('click', () => folderContainer.classList.toggle('open'));
     folderContainer.appendChild(folderHeader);
@@ -59,6 +59,7 @@ export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
       folderItem.dataset.id = snippet.id;
       folderItem.classList.add('folder-item');
       folderItemButton.innerHTML = html`<span class="px-2 py-1">${snippet.name}</span>`;
+      folderItemButton.className = 'bg-fg/20';
 
       folderItem.appendChild(folderItemButton);
       folderItemButton.appendChild(createFavouriteCheckbox(snippet));

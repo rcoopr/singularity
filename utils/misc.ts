@@ -1,4 +1,4 @@
-import { bundledThemesInfo, BundledTheme } from 'shiki';
+import { bundledThemesInfo, BundledTheme, bundledThemes } from 'shiki';
 
 export const html = String.raw;
 
@@ -23,22 +23,42 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export async function initialUpdatePageTheme(theme: BundledTheme) {
+  const themeRegistration = (await bundledThemes[theme]()).default;
+
+  const fg = themeRegistration.colors?.['editor.foreground'];
+  const bg =
+    themeRegistration.colors?.background || themeRegistration.colors?.['editor.background'];
+
+  const fgChannels = getColorChannels(fg);
+  const bgChannels = getColorChannels(bg);
+
+  if (fgChannels) document.body.style.setProperty('--fg', fgChannels);
+  if (bgChannels) document.body.style.setProperty('--bg', bgChannels);
+
+  if (!fgChannels && !bgChannels) {
+    log.debug("Couldn't find fg or bg colors in theme, skipping setting them on body.");
+    updatePageTheme(theme);
+  }
+}
+
 export function updatePageTheme(theme: BundledTheme, pre?: HTMLPreElement | null) {
   const themeInfo = bundledThemesInfo.find((t) => t.id === theme);
   document.body.classList[themeInfo?.type === 'light' ? 'remove' : 'add']('dark');
 
-  // if (pre) {
-  //   const fg = pre.style.color;
-  //   const bg = pre.style.backgroundColor;
-  //   const fgChannels = getColorChannels(fg);
-  //   const bgChannels = getColorChannels(bg);
+  if (pre) {
+    const fg = pre.style.color;
+    const bg = pre.style.backgroundColor;
+    const fgChannels = getColorChannels(fg);
+    const bgChannels = getColorChannels(bg);
 
-  //   if (fgChannels) document.body.style.setProperty('--fg', fgChannels);
-  //   if (bgChannels) document.body.style.setProperty('--bg', bgChannels);
-  // }
+    if (fgChannels) document.body.style.setProperty('--fg', fgChannels);
+    if (bgChannels) document.body.style.setProperty('--bg', bgChannels);
+  }
 }
 
-function getColorChannels(color: CSSStyleDeclaration['color']) {
+function getColorChannels(color?: CSSStyleDeclaration['color']) {
+  if (!color) return;
   const rgb = colorStringToRgb(color);
   if (!rgb) return;
   return `${rgb.r} ${rgb.g} ${rgb.b}`;

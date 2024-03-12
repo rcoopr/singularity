@@ -6,9 +6,9 @@ export function initDialogs() {
   if (isInitialized) return;
   isInitialized = true;
 
-  const dialogs = document.querySelectorAll('dialog');
+  const snippetCrudDialogs = document.querySelectorAll<HTMLDialogElement>('dialog.dialog-snippet');
 
-  for (const dialog of dialogs) {
+  for (const dialog of snippetCrudDialogs) {
     const trigger = dialog.dataset.trigger;
     if (!trigger) return;
 
@@ -45,6 +45,51 @@ export function initDialogs() {
 
       dialog.close();
     });
+  }
+
+  const importExportDialog = document.querySelector<HTMLDialogElement>(
+    'dialog.dialog-import-export'
+  );
+  if (importExportDialog) {
+    const trigger = importExportDialog.dataset.trigger;
+    const exportButton = document.querySelector<HTMLButtonElement>('#export');
+    const deleteAllSnippetsButton = document.querySelector<HTMLButtonElement>('#delete-snippets');
+    const form = importExportDialog.querySelector<HTMLFormElement>('form');
+    const triggerButton = document.querySelector<HTMLButtonElement>(`#${trigger}`);
+
+    triggerButton?.addEventListener('click', () => importExportDialog.showModal());
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      console.log(e.currentTarget);
+      const formData = new FormData(e.currentTarget as HTMLFormElement);
+      const file = formData.get('import') as File;
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const content = e.target?.result as string;
+          const snippetsRepo = getSnippetsRepo();
+          const snippets = JSON.parse(content) as Snippet[];
+          log.debug({ content, snippets });
+          try {
+            await snippetsRepo.import(snippets);
+            selectSnippet(undefined);
+          } catch (e) {
+            log.error('Error importing snippets', e);
+          }
+          form.reset();
+          importExportDialog.close();
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    const snippetsRepo = getSnippetsRepo();
+    exportButton?.addEventListener('click', () => exportSnippets());
+    deleteAllSnippetsButton?.addEventListener('click', async () => {
+      await snippetsRepo.deleteAll();
+      selectSnippet(undefined);
+    });
+    form?.addEventListener('reset', () => importExportDialog?.close());
   }
 }
 
@@ -133,3 +178,24 @@ async function deleteSnippetFormHandler(formData: FormData) {
   const snippetsRepo = getSnippetsRepo();
   return await snippetsRepo.delete(id);
 }
+
+// This function assumes that you have a function getSnippets() that returns all snippets
+export async function exportSnippets() {
+  const snippetsRepo = getSnippetsRepo();
+  const snippets = await snippetsRepo.getAll();
+  const json = JSON.stringify(snippets);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = 'snippets.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Add this code where you initialize your buttons
+const exportButton = document.querySelector<HTMLButtonElement>('#exportButton');
+exportButton?.addEventListener('click', exportSnippets);

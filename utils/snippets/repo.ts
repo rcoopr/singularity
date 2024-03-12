@@ -9,8 +9,10 @@ export type SnippetsRepo = {
   createOrUpdate(snippet: SnippetInput): Promise<Snippet | undefined>;
   update(id: Snippet['id'], snippet: SnippetUpdate): Promise<Snippet | undefined>;
   delete(id: Snippet['id']): Promise<void>;
+  deleteAll(): Promise<void>;
   getOne(id: Snippet['id']): Promise<Snippet>;
   getAll(): Promise<Snippet[]>;
+  import(snippets: SnippetInput[]): Promise<Snippet[]>;
 };
 
 export type Snippet = {
@@ -25,19 +27,18 @@ export type Snippet = {
   updatedAt?: number;
 };
 export type SnippetInput = SetOptional<
-  Omit<Snippet, 'id' | 'createdAt' | 'updatedAt'>,
-  'favourite' | 'lang'
+  Omit<Snippet, 'createdAt' | 'updatedAt'>,
+  'id' | 'favourite' | 'lang'
 >;
 export type SnippetUpdate = Partial<Omit<Snippet, 'id' | 'createdAt' | 'updatedAt'>>;
 
 function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
   return {
     async createOrUpdate(snippet) {
-      const id = nanoid();
       const snippetWithDefaults = {
         ...snippet,
+        id: snippet.id || nanoid(),
         code: snippet.code.trim(),
-        id,
         createdAt: Date.now(),
         favourite: snippet.favourite === undefined ? true : !!snippet.favourite,
         lang: snippet.lang || 'javascript',
@@ -53,7 +54,6 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
       log.debug('Snippet added:', snippetWithDefaults);
       const updateContextMenu = getUpdateContextMenuRepo();
       updateContextMenu.update();
-      // void backgroundMessenger.sendMessage('snippetAdded', snippetWithDefaults);
       return snippetWithDefaults;
     },
     async update(id, properties) {
@@ -86,7 +86,6 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
       log.debug('Snippet updated:', updatedSnippet);
       const updateContextMenu = getUpdateContextMenuRepo();
       updateContextMenu.update();
-      // void backgroundMessenger.sendMessage('snippetUpdated', updatedSnippet);
       return updatedSnippet;
     },
     async delete(id) {
@@ -100,13 +99,50 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
       log.debug('Snippet deleted:', id);
       const updateContextMenu = getUpdateContextMenuRepo();
       updateContextMenu.update();
-      // void backgroundMessenger.sendMessage('snippetDeleted', { id });
     },
     async getOne(id) {
       return await (await db).get('snippets', id);
     },
     async getAll() {
       return await (await db).getAll('snippets');
+    },
+    async deleteAll() {
+      try {
+        await (await db).clear('snippets');
+      } catch (e) {
+        log.warn(`Failed to delete all snippets`, e);
+        return;
+      }
+
+      log.debug('All snippets deleted');
+      const updateContextMenu = getUpdateContextMenuRepo();
+      updateContextMenu.update();
+    },
+    async import(snippets) {
+      const snippetsWithDefaults = snippets.map((snippet) => ({
+        ...snippet,
+        code: snippet.code.trim(),
+        id: nanoid(),
+        createdAt: Date.now(),
+        favourite: snippet.favourite === undefined ? true : !!snippet.favourite,
+        lang: snippet.lang || 'javascript',
+      }));
+
+      const tx = (await db).transaction('snippets', 'readwrite');
+      try {
+        for (const snippet of snippetsWithDefaults) {
+          tx.store.put(snippet);
+        }
+        await tx.done;
+      } catch (e) {
+        log.warn('Failed to add snippets', e);
+        return [];
+      }
+
+      log.debug('Snippets added:', snippetsWithDefaults);
+      const updateContextMenu = getUpdateContextMenuRepo();
+      updateContextMenu.update();
+      return snippetsWithDefaults;
     },
   };
 }

@@ -48,8 +48,8 @@ body:where(.dark) .radio-group input:checked + label {
 }
 
 .select {
-  border: 1px solid theme('colors.zinc.400');
-  background: theme('colors.zinc.200');
+  border: 1px solid rgb(var(--fg) / 0.3);
+  background-color: rgb(var(--bg));
   font-size: 1rem;
   border-radius: 0.25rem;
   padding: 5px;
@@ -57,10 +57,6 @@ body:where(.dark) .radio-group input:checked + label {
 .select:focus {
   outline: 2px solid theme('colors.indigo.400');
   outline-offset: 2px;
-}
-body:where(.dark) .select {
-  border-color: theme('colors.zinc.700');
-  background: theme('colors.zinc.800');
 }
 
 @media (max-width: 500px) {

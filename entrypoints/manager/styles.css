@@ -23,7 +23,6 @@
 }
 
 .folder-header {
-  background-color: theme('colors.zinc.100');
   border-radius: 0.25rem;
   padding: 5px 10px;
   font-weight: bold;
@@ -31,9 +30,6 @@
   margin-bottom: 0.25rem;
   position: relative;
   text-transform: capitalize;
-}
-body:where(.dark) .folder-header {
-  background-color: theme('colors.zinc.900');
 }
 
 .folder-header::after {
@@ -88,14 +84,13 @@ body:where(.dark) .folder-header {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background-color: theme('colors.zinc.300');
-}
-body:where(.dark) .folder-item > button {
-  background-color: theme('colors.zinc.700');
+  color: rgb(var(--fg));
+  border-color: rgb(var(--fg) / 0.1);
 }
 .folder-item > button:hover {
   z-index: 2;
   background-color: theme('colors.indigo.600');
+  color: theme('colors.zinc.100');
 }
 .folder-item:has(.favourite:active) > button:active {
   transform: translateY(0);
@@ -105,18 +100,12 @@ body:where(.dark) .folder-item > button {
 .folder-item.selected > button {
   outline: none;
   background: theme('colors.indigo.700');
-  border-color: transparent;
   color: theme('colors.zinc.100');
-}
-body:where(.dark) .folder-item > button:focus,
-body:where(.dark) .folder-item.selected > button {
-  color: inherit;
-  background: theme('colors.indigo.700');
 }
 .folder-item > button:focus,
 .folder-item > button:focus:hover,
 .folder-item.selected > button:hover {
-  border-color: theme('colors.indigo.500');
+  border-color: rgb(var(--fg) / 0.3);
 }
 
 .folder-item:hover .favourite {
@@ -129,7 +118,6 @@ body:where(.dark) .folder-item.selected > button {
   border-radius: theme('borderRadius.DEFAULT');
   border: none;
   background: transparent;
-  color: theme('colors.zinc.300');
   @apply transition-all;
 }
 .favourite:hover {
@@ -160,6 +148,7 @@ button.copy {
   --vp-icon-copy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='rgba(128,128,128,1)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3C/svg%3E");
   --vp-icon-copied: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='rgba(128,128,128,1)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3Cpath d='m9 14 2 2 4-4'/%3E%3C/svg%3E");
 
+  --content: 'Copied!';
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
@@ -172,12 +161,12 @@ button.copy {
   background-size: 20px;
   background-repeat: no-repeat;
   transition: border-color 0.25s, background-color 0.25s, opacity 0.25s;
-  border: 1px solid theme('colors.zinc.300');
-  background-color: theme('colors.zinc.100');
+  border-color: rgb(0 0 0 / 0.1);
+  background-color: rgb(0 0 0 / 0.07);
 }
 body:where(.dark) button.copy {
-  border-color: theme('colors.zinc.700');
-  background-color: theme('colors.zinc.900');
+  border-color: rgb(0 0 0 / 0.1);
+  background-color: rgb(0 0 0 / 0.2);
 }
 
 button.copied {
@@ -186,7 +175,7 @@ button.copied {
 }
 
 button.copy::before {
-  content: 'Copied!';
+  content: var(--content);
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -196,12 +185,12 @@ button.copy::before {
   opacity: 0;
   transition: opacity 0.25s;
   pointer-events: none;
-  border: 1px solid theme('colors.zinc.300');
-  background-color: theme('colors.zinc.100');
+  border-color: rgb(0 0 0 / 0.1);
+  background-color: rgb(0 0 0 / 0.07);
 }
 body:where(.dark) button.copy::before {
-  border-color: theme('colors.zinc.700');
-  background-color: theme('colors.zinc.900');
+  border-color: rgb(0 0 0 / 0.1);
+  background-color: rgb(0 0 0 / 0.2);
 }
 
 button.copied::before {
@@ -210,8 +199,8 @@ button.copied::before {
 
 #add-snippet {
   background-color: theme('colors.emerald.500');
-  border-color: theme('colors.emerald.400');
-  color: theme('colors.zinc.900');
+  border-color: theme('colors.emerald.600');
+  color: theme('colors.zinc.100');
   font-weight: bold;
   border-radius: theme('borderRadius.md');
   padding: theme('spacing[2]');
@@ -220,7 +209,7 @@ button.copied::before {
   background-color: theme('colors.emerald.400');
 }
 body:where(.dark) #add-snippet:hover {
-  background-color: theme('colors.emerald.600');
+  background-color: theme('colors.emerald.700');
 }
 #add-snippet:focus {
   outline: 2px solid theme('colors.emerald.900');

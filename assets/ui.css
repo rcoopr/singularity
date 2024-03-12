@@ -44,8 +44,8 @@ body:where(.dark) {
 }
 
 button {
-  border: 1px solid theme('colors.zinc.200');
-  background-color: theme('colors.zinc.300');
+  border: 1px solid rgb(var(--fg) / 0.2);
+  background-color: rgb(var(--fg) / 0.2);
   border-radius: 0.25rem;
   padding: 0.6em 1.2em;
   font-size: 1em;
@@ -54,18 +54,10 @@ button {
   cursor: pointer;
   user-select: none;
 }
-body:where(.dark) button {
-  border-color: theme('colors.zinc.700');
-  background-color: theme('colors.zinc.800');
-}
 
 button:hover {
-  border-color: theme('colors.indigo.300');
-  background-color: theme('colors.zinc.100');
-}
-body:where(.dark) button:hover {
-  border-color: theme('colors.indigo.500');
-  background-color: theme('colors.zinc.900');
+  border-color: rgb(var(--fg) / 0.3);
+  background-color: rgb(var(--fg) / 0.3);
 }
 
 button:active {

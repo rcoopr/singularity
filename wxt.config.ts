@@ -20,5 +20,8 @@ export default defineConfig({
     content_security_policy: {
       extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
     },
+    name: 'Singularity',
+    description: 'A snippet manager for Singular.live composition scripts',
+    author: 'Ross Cooper',
   },
 });
