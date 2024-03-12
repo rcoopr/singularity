@@ -1,8 +1,10 @@
 import { Snippet } from '@/utils/snippets/repo';
 import { dateFormat, html, writeToClipboard } from '@/utils/misc';
-import { BundledTheme, codeToHtml } from 'shiki';
+import { BundledTheme } from 'shiki';
 import { options } from '@/utils/preferences/storage';
 import { updatePageTheme, langAbbreviations } from '@/utils/misc';
+import { getHighlighter, loadSelectedTheme } from '@/utils/shiki/shiki';
+import { transpile } from '@/utils/sucrase/transpile';
 
 export function renderSnippetEditor(snippet: Snippet | undefined) {
   const root = document.querySelector<HTMLDivElement>('#snippet-editor');
@@ -34,6 +36,7 @@ async function renderSnippetCode(
   }
 
   if (!selectedSnippet) {
+    log.debug('no selected snippet');
     root.innerHTML = html`<p class="snippet-editor-empty">No snippet selected</p>`;
     updatePageTheme(theme);
     return;
@@ -48,7 +51,8 @@ async function renderSnippetCode(
     snippetPreview.classList.add('h-full', 'animate-in', 'fade-in', 'relative', 'group');
   }
 
-  const codeHtml = await codeToHtml(selectedSnippet.code, {
+  await loadSelectedTheme();
+  const codeHtml = (await getHighlighter()).codeToHtml(selectedSnippet.code, {
     lang: selectedSnippet.lang || 'javascript',
     theme,
   });
@@ -58,15 +62,24 @@ async function renderSnippetCode(
   const copyButton = document.createElement('button');
   copyButton.classList.add('copy', 'opacity-0', 'group-hover:opacity-100');
   copyButton.addEventListener('click', async () => {
-    await writeToClipboard(selectedSnippet.code);
+    const code =
+      selectedSnippet.lang === 'typescript'
+        ? transpile(selectedSnippet.code)
+        : selectedSnippet.code;
+    await writeToClipboard(code);
+    log.debug('Write to clipboard:\n', code);
     copyButton.classList.add('copied');
     window.setTimeout(() => copyButton.classList.remove('copied'), 3000);
   });
   snippetPreview.prepend(copyButton);
 
   appendMetadata(snippetPreview, selectedSnippet);
-  if (!existingSnippet) root.appendChild(snippetPreview);
-  updatePageTheme(theme);
+  if (!existingSnippet) {
+    root.innerHTML = '';
+    root.appendChild(snippetPreview);
+  }
+
+  updatePageTheme(theme, snippetPreview.querySelector('pre'));
 }
 
 export async function updateEditorTheme(theme: BundledTheme) {
@@ -80,8 +93,6 @@ function appendMetadata(root: HTMLElement, snippet: Snippet) {
 
   const metadata = document.createElement('div');
   metadata.classList.add('metadata');
-  if (color) metadata.style.color = color;
-  if (backgroundColor) metadata.style.backgroundColor = backgroundColor;
 
   if (snippet.updatedAt) {
     metadata.innerHTML += html`<span class="snippet-date"
@@ -94,19 +105,19 @@ function appendMetadata(root: HTMLElement, snippet: Snippet) {
   `;
 
   const langIndicator = document.createElement('div');
-  langIndicator.classList.add(
-    'absolute',
-    'm-3',
-    'bottom-full',
-    'right-0',
-    'text-sm',
-    'font-bold',
-    'not-italic',
-    'text-gray-400',
-    'opacity-50'
-  );
-  langIndicator.textContent = langAbbreviations[snippet.lang || 'javascript'];
-  metadata.appendChild(langIndicator);
+  langIndicator.className =
+    'absolute m-3 bottom-full right-0 text-sm font-bold not-italic text-zinc-900 dark:text-zinc-100 opacity-40';
+  langIndicator.textContent = langAbbreviations[snippet.lang];
 
+  if (color) {
+    metadata.style.color = color;
+    langIndicator.style.color = color;
+  }
+  if (backgroundColor) {
+    // metadata.style.backgroundColor = backgroundColor;
+    // document.body.style.backgroundColor = backgroundColor;
+  }
+
+  metadata.appendChild(langIndicator);
   root.appendChild(metadata);
 }

@@ -23,7 +23,7 @@
       <main class="overflow-hidden">
         <section id="snippet-manager" class="h-full">
           <div
-            class="split-panel-container w-full max-w-[calc(100vw-4rem)] h-full min-h-[400px] flex rounded-md overflow-hidden"
+            class="split-panel-container w-full max-w-[calc(100vw-4rem)] h-full min-h-[400px] flex rounded-md"
           >
             <aside class="split-panel w-[25%]">
               <section
@@ -58,10 +58,18 @@
       <dialog id="add-snippet-dialog" data-trigger="add-snippet">
         <form method="dialog">
           <h1>Add Snippet</h1>
-          <label>
-            <span>Name:</span>
-            <input class="mt-2 mb-4" type="text" name="name" required />
-          </label>
+          <div class="flex items-stretch gap-4 mb-4 flex-wrap justify-between">
+            <label class="grow">
+              <span class="mb-1 inline-block">Name:</span>
+              <input type="text" name="name" required />
+            </label>
+            <label class="flex flex-col items-center">
+              <span class="mb-1">Favourite:</span>
+              <div class="flex-1 flex items-center">
+                <input type="checkbox" name="favourite" checked class="w-6 h-6 accent-indigo-600" />
+              </div>
+            </label>
+          </div>
           <div class="flex items-stretch gap-4 mb-4 flex-wrap justify-between">
             <fieldset class="radio-group">
               <legend class="label">Language:</legend>
@@ -102,12 +110,6 @@
               <input type="radio" name="context" id="context-shared" value="shared" />
               <label for="context-shared">Shared</label>
             </fieldset>
-            <label class="flex flex-col items-center">
-              <span class="mb-1">Favourite:</span>
-              <div class="flex-1 flex items-center">
-                <input type="checkbox" name="favourite" checked class="w-6 h-6 accent-indigo-600" />
-              </div>
-            </label>
           </div>
           <label>
             <span>Description:</span>
@@ -127,21 +129,22 @@
         <form method="dialog">
           <h1>Edit Snippet</h1>
           <input type="hidden" name="id" />
-          <label>
-            <span>Name:</span>
-            <input class="mt-2 mb-4" type="text" name="name" required />
-          </label>
           <div class="flex items-stretch gap-4 mb-4 flex-wrap justify-between">
-            <fieldset class="radio-group">
+            <label class="grow">
+              <span class="mb-1 inline-block">Name:</span>
+              <input type="text" name="name" required />
+            </label>
+            <label class="flex flex-col items-center">
+              <span class="mb-1">Favourite:</span>
+              <div class="flex-1 flex items-center">
+                <input type="checkbox" name="favourite" checked class="w-6 h-6 accent-indigo-600" />
+              </div>
+            </label>
+          </div>
+          <div class="flex items-stretch gap-4 mb-4 flex-wrap justify-center">
+            <fieldset class="radio-group" onclick="console.log">
               <legend class="label">Language:</legend>
-              <input
-                type="radio"
-                name="lang"
-                id="lang-javascript"
-                value="javascript"
-                checked
-                required
-              />
+              <input type="radio" name="lang" id="lang-javascript" value="javascript" required />
               <label for="lang-javascript">Javascript</label>
 
               <input type="radio" name="lang" id="lang-typescript" value="typescript" />
@@ -157,7 +160,6 @@
                 name="context"
                 id="context-composition"
                 value="composition"
-                checked
                 required
               />
               <label for="context-composition">Composition</label>
@@ -171,12 +173,6 @@
               <input type="radio" name="context" id="context-shared" value="shared" />
               <label for="context-shared">Shared</label>
             </fieldset>
-            <label class="flex flex-col items-center">
-              <span class="mb-1">Favourite:</span>
-              <div class="flex-1 flex items-center">
-                <input type="checkbox" name="favourite" checked class="w-6 h-6 accent-indigo-600" />
-              </div>
-            </label>
           </div>
           <label>
             <span>Description:</span>

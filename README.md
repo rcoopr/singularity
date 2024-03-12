@@ -12,4 +12,5 @@ Snippet manager for Singular.live
 - add quick-add from clipboard
 - add more snippets
 - add import/export features
-- add favourite switch - on by default
+- cache html from shiki by snippet id/code
+- animations and make look nice

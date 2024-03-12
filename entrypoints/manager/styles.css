@@ -129,7 +129,7 @@ body:where(.dark) .folder-item.selected > button {
   border-radius: theme('borderRadius.DEFAULT');
   border: none;
   background: transparent;
-  color: theme('colors.yellow.300');
+  color: theme('colors.zinc.300');
   @apply transition-all;
 }
 .favourite:hover {
@@ -138,7 +138,6 @@ body:where(.dark) .folder-item.selected > button {
 .favourite:focus {
   outline: none;
   opacity: 1;
-  color: theme('colors.yellow.300');
   background: theme('colors.indigo.500');
 }
 .favourite:active {
@@ -296,7 +295,7 @@ body:where(.dark) dialog textarea {
 
 dialog textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 8rem;
 }
 
 dialog menu {

@@ -36,6 +36,7 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
       const id = nanoid();
       const snippetWithDefaults = {
         ...snippet,
+        code: snippet.code.trim(),
         id,
         createdAt: Date.now(),
         favourite: snippet.favourite === undefined ? true : !!snippet.favourite,
@@ -73,6 +74,7 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         ...properties,
         updatedAt: Date.now(),
       };
+      updatedSnippet.code = updatedSnippet.code.trim();
 
       try {
         await (await db).put('snippets', updatedSnippet);
@@ -125,7 +127,10 @@ export function groupSnippetsByContext(snippets: Snippet[]): {
   return snippetContexts
     .map((context) => ({
       context,
-      snippets: grouped[context] || [],
+      snippets:
+        grouped[context]?.sort(
+          (a, b) => Number(b.favourite) - Number(a.favourite) || a.name.localeCompare(b.name)
+        ) || [],
     }))
     .filter((group) => group.snippets.length > 0);
 }
