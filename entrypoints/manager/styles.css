@@ -241,7 +241,7 @@ dialog {
 }
 body:where(.dark) dialog {
   /* background: theme('colors.zinc.900'); */
-  background: rgba(24, 24, 27, 0.2);
+  background: rgba(24, 24, 27, 0.8);
   color: theme('colors.zinc.100');
 }
 

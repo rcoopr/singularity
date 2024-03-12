@@ -9,12 +9,14 @@
     <link href="~/assets/ui.css" rel="stylesheet" />
     <link href="~/assets/controls.css" rel="stylesheet" />
   </head>
-  <body class="justify-center min-h-screen">
+  <body class="justify-center min-h-screen dark">
     <div id="app" class="h-screen grid gap-4 grid-rows-[auto,1fr,auto] overflow-hidden">
       <header>
         <div class="flex gap-4 items-baseline justify-between">
           <h1 class="font-mono text-xl mb-2">Singularity</h1>
-          <h2 class="font-mono text-md mb-2 text-zinc-600 dark:text-zinc-400">Snippet manager for Singular.live</h1>
+          <h2 class="font-mono text-md mb-2 text-zinc-600 dark:text-zinc-400">
+            Snippet manager for Singular.live
+          </h2>
         </div>
         <hr class="border-zinc-600" />
       </header>
@@ -30,9 +32,7 @@
               ></section>
               <button id="add-snippet" class="rounded-md">Add Snippet</button>
             </aside>
-            <div
-              class="separator cursor-col-resize bg-no-repeat bg-center w-2 select-none"
-            ></div>
+            <div class="separator cursor-col-resize bg-no-repeat bg-center w-2 select-none"></div>
             <div class="split-panel w-[75%]">
               <header
                 class="flex items-center flex-wrap justify-between gap-4 bg-zinc-200 dark:bg-zinc-800 rounded-md p-2"
@@ -58,52 +58,29 @@
       <dialog id="add-snippet-dialog" data-trigger="add-snippet">
         <form method="dialog">
           <h1>Add Snippet</h1>
-          <div class="flex items-center gap-4 mb-4">
-            <label>
-              <span>Name:</span>
-              <input class="mt-2" type="text" name="name" required />
-            </label>
+          <label>
+            <span>Name:</span>
+            <input class="mt-2 mb-4" type="text" name="name" required />
+          </label>
+          <div class="flex items-stretch gap-4 mb-4 flex-wrap justify-between">
             <fieldset class="radio-group">
-              <legend class="label">Context:</legend>
+              <legend class="label">Language:</legend>
               <input
                 type="radio"
-                name="context"
-                id="context-composition"
-                value="composition"
+                name="lang"
+                id="lang-javascript"
+                value="javascript"
                 checked
+                required
               />
-              <label for="context-composition">Composition</label>
-              <input type="radio" name="context" id="context-global" value="global" />
-              <label for="context-global">Global</label>
-              <input type="radio" name="context" id="context-overlay" value="overlay" />
-              <label for="context-overlay">Overlay</label>
-              <input type="radio" name="context" id="context-shared" value="shared" />
-              <label for="context-shared">Shared</label>
+              <label for="lang-javascript">Javascript</label>
+
+              <input type="radio" name="lang" id="lang-typescript" value="typescript" />
+              <label for="lang-typescript">Typescript</label>
+
+              <input type="radio" name="lang" id="lang-html" value="html" />
+              <label for="lang-html">HTML</label>
             </fieldset>
-          </div>
-          <label>
-            <span>Description:</span>
-            <input class="mt-2 mb-4" type="text" name="description" />
-          </label>
-          <label>
-            <span>Code:</span>
-            <textarea class="font-mono mt-2" type="text" name="code" required></textarea>
-          </label>
-          <menu>
-            <button type="submit">Save</button>
-            <button type="reset">Close</button>
-          </menu>
-        </form>
-      </dialog>
-      <dialog id="edit-snippet-dialog" data-trigger="edit-snippet">
-        <form method="dialog">
-          <h1>Edit Snippet</h1>
-          <input type="hidden" name="id" />
-          <div class="flex items-center gap-4 mb-4">
-            <label>
-              <span>Name:</span>
-              <input class="mt-2" type="text" name="name" required />
-            </label>
             <fieldset class="radio-group">
               <legend class="label">Context:</legend>
               <input
@@ -125,6 +102,81 @@
               <input type="radio" name="context" id="context-shared" value="shared" />
               <label for="context-shared">Shared</label>
             </fieldset>
+            <label class="flex flex-col items-center">
+              <span class="mb-1">Favourite:</span>
+              <div class="flex-1 flex items-center">
+                <input type="checkbox" name="favourite" checked class="w-6 h-6 accent-indigo-600" />
+              </div>
+            </label>
+          </div>
+          <label>
+            <span>Description:</span>
+            <input class="mt-2 mb-4" type="text" name="description" />
+          </label>
+          <label>
+            <span>Code:</span>
+            <textarea class="font-mono mt-2" type="text" name="code" required></textarea>
+          </label>
+          <menu>
+            <button type="submit">Save</button>
+            <button type="reset">Close</button>
+          </menu>
+        </form>
+      </dialog>
+      <dialog id="edit-snippet-dialog" data-trigger="edit-snippet">
+        <form method="dialog">
+          <h1>Edit Snippet</h1>
+          <input type="hidden" name="id" />
+          <label>
+            <span>Name:</span>
+            <input class="mt-2 mb-4" type="text" name="name" required />
+          </label>
+          <div class="flex items-stretch gap-4 mb-4 flex-wrap justify-between">
+            <fieldset class="radio-group">
+              <legend class="label">Language:</legend>
+              <input
+                type="radio"
+                name="lang"
+                id="lang-javascript"
+                value="javascript"
+                checked
+                required
+              />
+              <label for="lang-javascript">Javascript</label>
+
+              <input type="radio" name="lang" id="lang-typescript" value="typescript" />
+              <label for="lang-typescript">Typescript</label>
+
+              <input type="radio" name="lang" id="lang-html" value="html" />
+              <label for="lang-html">HTML</label>
+            </fieldset>
+            <fieldset class="radio-group">
+              <legend class="label">Context:</legend>
+              <input
+                type="radio"
+                name="context"
+                id="context-composition"
+                value="composition"
+                checked
+                required
+              />
+              <label for="context-composition">Composition</label>
+
+              <input type="radio" name="context" id="context-global" value="global" />
+              <label for="context-global">Global</label>
+
+              <input type="radio" name="context" id="context-overlay" value="overlay" />
+              <label for="context-overlay">Overlay</label>
+
+              <input type="radio" name="context" id="context-shared" value="shared" />
+              <label for="context-shared">Shared</label>
+            </fieldset>
+            <label class="flex flex-col items-center">
+              <span class="mb-1">Favourite:</span>
+              <div class="flex-1 flex items-center">
+                <input type="checkbox" name="favourite" checked class="w-6 h-6 accent-indigo-600" />
+              </div>
+            </label>
           </div>
           <label>
             <span>Description:</span>

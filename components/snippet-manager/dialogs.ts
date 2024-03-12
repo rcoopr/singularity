@@ -1,4 +1,4 @@
-import { Snippet, getSnippetsRepo, isSnippetContext } from '@/utils/snippets/repo';
+import { Snippet, getSnippetsRepo, isSnippetContext, isValidLang } from '@/utils/snippets/repo';
 import { selectSnippet } from '@/components/snippet-manager/select-snippet';
 
 var isInitialized = false;
@@ -60,7 +60,21 @@ export function updateDialogs(selectedSnippet: Snippet | undefined) {
           return;
         }
 
-        // TODO - maybe causes issues with booleans etc
+        const value = selectedSnippet[input.name as keyof Snippet];
+        if (input.name === 'lang') {
+          input.checked = input.value === value;
+          return;
+        }
+
+        if (input.name === 'context') {
+          input.checked = input.value === value;
+          return;
+        }
+
+        if (input.name === 'favourite') {
+          input.checked = !!value;
+        }
+
         input.value = selectedSnippet[input.name as keyof Snippet]?.toString() || '';
       });
       const codeInput = dialog.querySelector('textarea');
@@ -80,15 +94,18 @@ async function addSnippetFormHandler(formData: FormData) {
   const name = formData.get('name')?.toString() ?? '';
   const code = formData.get('code')?.toString() ?? '';
   const desc = formData.get('description')?.toString() ?? '';
+  const favourite = Boolean(formData.get('favourite'));
   const contextStr = formData.get('context')?.toString() ?? '';
   const context = isSnippetContext(contextStr) ? contextStr : 'composition';
+  const langStr = formData.get('lang')?.toString() ?? 'javascript';
+  const lang = isValidLang(langStr) ? langStr : 'javascript';
 
   const snippetsRepo = getSnippetsRepo();
-  return await snippetsRepo.createOrUpdate({ name, code, desc, context });
+  return await snippetsRepo.createOrUpdate({ name, code, desc, context, favourite, lang });
 }
 
 async function editSnippetFormHandler(formData: FormData) {
-  const id = formData.get('name')?.toString();
+  const id = formData.get('id')?.toString();
   if (!id) {
     log.warn('No id found for snippet');
     return;
@@ -96,11 +113,14 @@ async function editSnippetFormHandler(formData: FormData) {
   const name = formData.get('name')?.toString() ?? '';
   const code = formData.get('code')?.toString() ?? '';
   const desc = formData.get('description')?.toString() ?? '';
+  const favourite = Boolean(formData.get('favourite'));
   const contextStr = formData.get('context')?.toString() ?? '';
   const context = isSnippetContext(contextStr) ? contextStr : 'composition';
+  const langStr = formData.get('lang')?.toString() ?? 'javascript';
+  const lang = isValidLang(langStr) ? langStr : 'javascript';
 
   const snippetsRepo = getSnippetsRepo();
-  return await snippetsRepo.update(id, { name, code, desc, context });
+  return await snippetsRepo.update(id, { name, code, desc, context, favourite, lang });
 }
 
 async function deleteSnippetFormHandler(formData: FormData) {
