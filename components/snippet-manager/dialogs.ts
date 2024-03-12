@@ -86,8 +86,14 @@ export function initDialogs() {
     const snippetsRepo = getSnippetsRepo();
     exportButton?.addEventListener('click', () => exportSnippets());
     deleteAllSnippetsButton?.addEventListener('click', async () => {
-      await snippetsRepo.deleteAll();
-      selectSnippet(undefined);
+      const shouldDelete = confirm(
+        "Are you sure you want to delete all snippets? This action can't be undone."
+      );
+
+      if (!!shouldDelete) {
+        await snippetsRepo.deleteAll();
+        selectSnippet(undefined);
+      }
     });
     form?.addEventListener('reset', () => importExportDialog?.close());
   }

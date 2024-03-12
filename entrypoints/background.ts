@@ -1,7 +1,6 @@
 import { openExtensionDatabase } from '@/utils/db';
 import { backgroundMessenger } from '@/utils/messenger/background';
 import { capitalize } from '@/utils/misc';
-import { defaultSnippets } from '@/utils/snippets/default-snippets';
 import { createSemaphore } from '@/utils/semaphore';
 import {
   Snippet,
@@ -45,7 +44,7 @@ export default defineBackground(() => {
   // TODO: replace with prompt in sidebar if empty. Good for dev though
   browser.runtime.onInstalled.addListener(async (details) => {
     if (!details.previousVersion) {
-      await Promise.all(defaultSnippets.map((snippet) => snippetsRepo.createOrUpdate(snippet)));
+      // await snippetsRepo.import(defaultSnippets);
     }
 
     await createContextMenus();
@@ -63,8 +62,15 @@ export default defineBackground(() => {
     // Queue multiple calls to this function
     await semaphore.acquire();
 
+    // async function getAllRelevantSnippets() {
+    //   const snippets = await snippetsRepo.getAll();
+    //   if ((await options.useFavourites.getValue()) === false) return snippets;
+    //   return snippets.filter((snippet) => snippet.favourite);
+    // }
+
     try {
       const [all] = await Promise.all([
+        // await getAllRelevantSnippets(),
         (await snippetsRepo.getAll()).filter((snippet) => snippet.favourite),
         await browser.contextMenus.removeAll(),
       ]);

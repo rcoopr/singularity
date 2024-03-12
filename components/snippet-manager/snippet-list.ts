@@ -39,8 +39,8 @@ export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
     const folderContainer = document.createElement('div');
     folderContainer.classList.add('folder', 'open');
 
-    const folderHeader = document.createElement('div');
-    folderHeader.classList.add('folder-header', 'bg-bg');
+    const folderHeader = document.createElement('button');
+    folderHeader.className = 'folder-header';
     folderHeader.textContent = folder.context;
     folderHeader.addEventListener('click', () => folderContainer.classList.toggle('open'));
     folderContainer.appendChild(folderHeader);

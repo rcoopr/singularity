@@ -30,6 +30,17 @@
   margin-bottom: 0.25rem;
   position: relative;
   text-transform: capitalize;
+  background-color: rgb(var(--bg));
+  width: 100%;
+  text-align: left;
+}
+.folder-header:hover {
+  background-color: rgb(var(--bg) / 0.6);
+}
+
+.folder-header:focus {
+  outline: 2px solid rgb(var(--btn-bg));
+  outline-offset: -2px;
 }
 
 .folder-header::after {
@@ -70,7 +81,7 @@
 }
 
 .folder-item:focus {
-  outline: 2px solid theme('colors.indigo.400');
+  outline: 2px solid rgb(var(--btn-bg));
   outline-offset: -2px;
 }
 .folder-item > button {
@@ -89,8 +100,8 @@
 }
 .folder-item > button:hover {
   z-index: 2;
-  background-color: theme('colors.indigo.600');
-  color: theme('colors.zinc.100');
+  background-color: rgb(var(--btn-bg) / 0.8);
+  color: rgb(var(--btn-fg));
 }
 .folder-item:has(.favourite:active) > button:active {
   transform: translateY(0);
@@ -99,8 +110,9 @@
 .folder-item > button:focus,
 .folder-item.selected > button {
   outline: none;
-  background: theme('colors.indigo.700');
-  color: theme('colors.zinc.100');
+  border-color: rgb(var(--btn-fg) / 0.4);
+  background-color: rgb(var(--btn-bg));
+  color: rgb(var(--btn-fg));
 }
 .folder-item > button:focus,
 .folder-item > button:focus:hover,
@@ -121,12 +133,12 @@
   @apply transition-all;
 }
 .favourite:hover {
-  background: theme('colors.indigo.500');
+  background: rgb(var(--btn-fg) / 0.3);
 }
 .favourite:focus {
   outline: none;
   opacity: 1;
-  background: theme('colors.indigo.500');
+  background: rgb(var(--btn-fg) / 0.3);
 }
 .favourite:active {
   transform: translateY(0) scale(1.1);
@@ -208,7 +220,11 @@ button.copied::before {
 #add-snippet:hover {
   background-color: theme('colors.emerald.400');
 }
+body:where(.dark) #add-snippet {
+  border-color: theme('colors.emerald.400');
+}
 body:where(.dark) #add-snippet:hover {
+  border-color: theme('colors.emerald.500');
   background-color: theme('colors.emerald.700');
 }
 #add-snippet:focus {
@@ -330,13 +346,6 @@ dialog #delete-snippet-form button[type='submit']:hover {
   place-content: center;
   font-size: 1.25rem;
   font-style: italic;
-  color: theme('colors.zinc.600');
-
-  @apply bg-gradient-to-b from-zinc-100;
-}
-body:where(.dark) .snippet-editor-empty {
-  color: theme('colors.zinc.400');
-  @apply bg-gradient-to-b from-zinc-800;
 }
 
 #snippet-editor pre {

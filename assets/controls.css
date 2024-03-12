@@ -31,20 +31,13 @@ body:where(.dark) .radio-group label {
 }
 .radio-group label:hover {
   z-index: 2;
-  border-color: theme('colors.indigo.600');
-}
-body:where(.dark) .radio-group label:hover {
-  border-color: theme('colors.indigo.500');
+  border-color: rgb(var(--btn-bg));
 }
 .radio-group input:checked + label {
   z-index: 1;
-  background: theme('colors.indigo.600');
-  border-color: theme('colors.indigo.900');
-  color: theme('colors.zinc.100');
-}
-body:where(.dark) .radio-group input:checked + label {
-  background: theme('colors.indigo.800');
-  border-color: theme('colors.indigo.500');
+  background: rgb(var(--btn-bg) / 0.8);
+  border-color: rgb(var(--btn-bg));
+  color: rgb(var(--btn-fg));
 }
 
 .select {
@@ -55,7 +48,7 @@ body:where(.dark) .radio-group input:checked + label {
   padding: 5px;
 }
 .select:focus {
-  outline: 2px solid theme('colors.indigo.400');
+  outline: 2px solid rgb(var(--btn-bg));
   outline-offset: 2px;
 }
 

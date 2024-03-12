@@ -1,3 +1,21 @@
+import { bundledColors } from '@/utils/shiki/bundled-colors';
+import { bundledThemesInfo, BundledTheme, bundledThemes } from 'shiki';
+
 export function prefersDark() {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return typeof window === undefined
+    ? true
+    : window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+export async function updatePageTheme(theme: BundledTheme) {
+  const themeInfo = bundledThemesInfo.find((t) => t.id === theme);
+  log.debug('Updating theme:', themeInfo);
+  document.body.classList[themeInfo?.type === 'light' ? 'remove' : 'add']('dark');
+
+  const channels = bundledColors[theme];
+
+  document.body.style.setProperty('--fg', channels.fg);
+  document.body.style.setProperty('--bg', channels.bg);
+  document.body.style.setProperty('--btn-fg', channels.btnFg);
+  document.body.style.setProperty('--btn-bg', channels.btnBg);
 }

@@ -12,19 +12,18 @@
 }
 
 a {
-  /* font-weight: 500; */
-  /* color: theme('colors.indigo.600'); */
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 a:hover {
-  /* color: theme('colors.indigo.500'); */
   text-underline-offset: 3px;
 }
 
 body {
   --fg: 39 39 42;
   --bg: 212 212 216;
+  --btn-fg: 235 188 186;
+  --btn-bg: 25 23 36;
 
   margin: 0;
   display: flex;
@@ -33,8 +32,8 @@ body {
   background-color: rgb(var(--bg));
 }
 body:where(.dark) {
-  --fg: 244 244 245;
-  --bg: 24 24 27;
+  --fg: 224 222 244;
+  --bg: 25 23 36;
 }
 
 #app {
@@ -70,25 +69,21 @@ input:focus,
 input:focus-visible,
 textarea:focus,
 textarea:focus-visible {
-  outline: 2px solid theme('colors.indigo.400');
+  outline: 2px solid rgb(var(--btn-bg));
   outline-offset: 2px;
 }
 
 button.primary {
-  background: theme('colors.indigo.600');
+  background-color: rgb(var(--btn-bg));
   width: 100%;
-  border: 1px solid theme('colors.indigo.500');
-  color: theme('colors.zinc.100');
-}
-body:where(.dark) button.primary {
-  background: theme('colors.indigo.600');
-  border-color: theme('colors.indigo.500');
-  color: inherit;
+  border: 1px solid rgb(var(--btn-fg) / 0.2);
+  color: rgb(var(--btn-fg));
 }
 
 button.primary:hover,
 body:where(.dark) button.primary:hover {
-  background: theme('colors.indigo.700');
+  background-color: rgb(var(--btn-bg) / 0.8);
+  border-color: rgb(var(--btn-fg) / 0.3);
 }
 
 .label {
@@ -110,7 +105,7 @@ pre:focus {
   content: '';
   position: absolute;
   inset: 0;
-  outline: 2px solid theme('colors.indigo.400');
+  outline: 2px solid rgb(var(--btn-bg));
   outline-offset: 1px;
   border-radius: theme('borderRadius.md');
 }

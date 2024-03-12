@@ -1,8 +1,8 @@
+import { updatePageTheme } from '@/utils/preferences/color-scheme';
 import { options } from '@/utils/preferences/storage';
-import { initialUpdatePageTheme } from '@/utils/misc';
 
 (async () => {
-  initialUpdatePageTheme(await options.theme.getValue());
+  updatePageTheme(await options.theme.getValue());
 })();
 
 options.theme.watch((theme) => {

@@ -2,9 +2,10 @@ import { Snippet } from '@/utils/snippets/repo';
 import { dateFormat, html, writeToClipboard } from '@/utils/misc';
 import { BundledTheme } from 'shiki';
 import { options } from '@/utils/preferences/storage';
-import { updatePageTheme, langAbbreviations } from '@/utils/misc';
+import { langAbbreviations } from '@/utils/misc';
 import { getHighlighter, loadSelectedTheme } from '@/utils/shiki/shiki';
 import { transpile } from '@/utils/sucrase/transpile';
+import { updatePageTheme } from '@/utils/preferences/color-scheme';
 
 export function renderSnippetEditor(snippet: Snippet | undefined) {
   const root = document.querySelector<HTMLDivElement>('#snippet-editor');
@@ -37,7 +38,9 @@ async function renderSnippetCode(
 
   if (!selectedSnippet) {
     log.debug('no selected snippet');
-    root.innerHTML = html`<p class="snippet-editor-empty">No snippet selected</p>`;
+    root.innerHTML = html`<p class="snippet-editor-empty bg-gradient-to-b from-fg/10 text-fg/60">
+      No snippet selected
+    </p>`;
     updatePageTheme(theme);
     return;
   }
@@ -83,7 +86,7 @@ async function renderSnippetCode(
     root.appendChild(snippetPreview);
   }
 
-  updatePageTheme(theme, snippetPreview.querySelector('pre'));
+  updatePageTheme(theme);
 }
 
 export async function updateEditorTheme(theme: BundledTheme) {

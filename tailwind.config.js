@@ -7,6 +7,8 @@ export default {
       colors: {
         fg: 'rgb(var(--fg) / <alpha-value>)',
         bg: 'rgb(var(--bg) / <alpha-value>)',
+        'btn-fg': 'rgb(var(--btn-fg) / <alpha-value>)',
+        'btn-bg': 'rgb(var(--btn-bg) / <alpha-value>)',
       },
       opacity: {
         1: '.01',
