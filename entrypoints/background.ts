@@ -10,6 +10,7 @@ import {
   registerSnippetsRepo,
 } from '@/utils/snippets/repo';
 import type { SetRequired } from 'type-fest';
+import { registerUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 
 export default defineBackground(() => {
   const INSERT_SNIPPET_ID = 'insert-snippet';
@@ -26,20 +27,9 @@ export default defineBackground(() => {
   const semaphore = createSemaphore();
   log.debug('Background script init');
 
-  backgroundMessenger.onMessage('snippetAdded', async () => {
-    await createContextMenus();
-  });
-
-  backgroundMessenger.onMessage('snippetUpdated', async () => {
-    await createContextMenus();
-  });
-
-  backgroundMessenger.onMessage('snippetDeleted', async () => {
-    await createContextMenus();
-  });
-
   const idb = openExtensionDatabase();
   const snippetsRepo = registerSnippetsRepo(idb);
+  registerUpdateContextMenuRepo(createContextMenus);
 
   backgroundMessenger.onMessage('context', async (message) => {
     currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;

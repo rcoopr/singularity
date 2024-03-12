@@ -3,7 +3,7 @@ import { IDBPDatabase } from 'idb';
 import { nanoid } from 'nanoid';
 import type { SetOptional } from 'type-fest';
 import groupBy from 'object.groupby';
-import { backgroundMessenger } from '@/utils/messenger/background';
+import { getUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 
 export type SnippetsRepo = {
   createOrUpdate(snippet: SnippetInput): Promise<Snippet | undefined>;
@@ -38,7 +38,7 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         ...snippet,
         id,
         createdAt: Date.now(),
-        favourite: !!snippet.favourite,
+        favourite: snippet.favourite === undefined ? true : !!snippet.favourite,
         lang: snippet.lang || 'javascript',
       };
 
@@ -49,15 +49,22 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         return;
       }
 
-      void backgroundMessenger.sendMessage('snippetAdded', snippetWithDefaults);
+      log.debug('Snippet added:', snippetWithDefaults);
+      const updateContextMenu = getUpdateContextMenuRepo();
+      updateContextMenu.update();
+      // void backgroundMessenger.sendMessage('snippetAdded', snippetWithDefaults);
       return snippetWithDefaults;
     },
     async update(id, properties) {
-      let snippet: Snippet;
+      let snippet: Snippet | undefined = undefined;
       try {
         snippet = await (await db).get('snippets', id);
       } catch (e) {
-        log.warn(`Failed to update snippet (Couldn't retrieve snippet)`, e);
+        log.warn(`Failed to update snippet (Couldn't access snippet)`);
+        return;
+      }
+      if (!snippet) {
+        log.warn(`Failed to update snippet (Couldn't retrieve snippet)`);
         return;
       }
 
@@ -66,6 +73,7 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         ...properties,
         updatedAt: Date.now(),
       };
+
       try {
         await (await db).put('snippets', updatedSnippet);
       } catch (e) {
@@ -73,7 +81,10 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         return;
       }
 
-      void backgroundMessenger.sendMessage('snippetUpdated', updatedSnippet);
+      log.debug('Snippet updated:', updatedSnippet);
+      const updateContextMenu = getUpdateContextMenuRepo();
+      updateContextMenu.update();
+      // void backgroundMessenger.sendMessage('snippetUpdated', updatedSnippet);
       return updatedSnippet;
     },
     async delete(id) {
@@ -83,7 +94,11 @@ function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
         log.warn(`Failed to delete snippet`, e);
         return;
       }
-      void backgroundMessenger.sendMessage('snippetDeleted', { id });
+
+      log.debug('Snippet deleted:', id);
+      const updateContextMenu = getUpdateContextMenuRepo();
+      updateContextMenu.update();
+      // void backgroundMessenger.sendMessage('snippetDeleted', { id });
     },
     async getOne(id) {
       return await (await db).get('snippets', id);
@@ -117,4 +132,8 @@ export function groupSnippetsByContext(snippets: Snippet[]): {
 
 export function isSnippetContext(context: string): context is SnippetContext {
   return snippetContexts.includes(context as SnippetContext);
+}
+
+export function isValidLang(lang: string): lang is Snippet['lang'] {
+  return ['javascript', 'typescript', 'html'].includes(lang);
 }

@@ -1,4 +1,5 @@
 import { AceSelectionEventHandler } from '@/types/ace';
+import { getUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 import { websiteMessenger } from '@/utils/messenger/website';
 import { SnippetContext } from '@/utils/snippets/repo';
 
@@ -26,9 +27,8 @@ const tabNameContextMap = {
 } as const;
 
 async function initCursorTracking() {
-  const el = await waitForEl('#jsonEditor-script');
+  const el = await waitForEl<HTMLElement>('#jsonEditor-script');
   if (el) {
-    // @ts-expect-error bad typings - el can be passed directly
     const editor = window.ace.edit(el);
 
     const cursorChangeHandler: AceSelectionEventHandler<'changeCursor'> = (_event, details) => {
@@ -70,10 +70,10 @@ async function initContextTracking() {
   }
 }
 
-function waitForEl(selector: string): Promise<Element | null | undefined> {
+function waitForEl<T extends Element>(selector: string): Promise<T | null | undefined> {
   return new Promise((resolve) => {
     if (document.querySelector(selector)) {
-      return resolve(document.querySelector(selector));
+      return resolve(document.querySelector(selector) as T | null);
     }
 
     const observer = new MutationObserver((mutations) => {
@@ -81,7 +81,7 @@ function waitForEl(selector: string): Promise<Element | null | undefined> {
         for (const node of mutation.addedNodes) {
           if (node instanceof HTMLElement && node.querySelector(selector)) {
             observer.disconnect();
-            resolve(document.querySelector(selector));
+            resolve(document.querySelector(selector) as T | null);
           }
         }
       }
