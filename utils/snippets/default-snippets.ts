@@ -42,7 +42,7 @@ export const defaultSnippets: SnippetInput[] = [
 `,
     context: 'global',
     lang: 'javascript',
-    name: 'Init function',
+    name: 'Init',
     desc: 'Boilerplate for a global script',
   },
 
@@ -100,11 +100,11 @@ context.global.timeline.addListener = addTimelineListener`,
   return {
     init: function(comp, context) {},
     close: function(comp, context) {}
-  };
-})();
+  }
+})()
 `,
     context: 'composition',
-    name: 'Init function',
+    name: 'Init',
     desc: 'Minimum code required for a composition script',
     lang: 'javascript',
   },
@@ -147,10 +147,10 @@ function injectFontFace(widget, fontName, url, format) {
   try {
     const documentNode = widget.getDomElement().querySelector("iframe").contentDocument
     const format = url.substring(formatPeriod + 1)
-    const style = documentNode.createElement('style');
+    const style = documentNode.createElement('style')
     
     style.appendChild(documentNode.createTextNode(\`@font-face { font-family: "\${fontName}"; src: url('\${url}') format('\${format}'); }\`));
-    documentNode.body.appendChild(style);
+    documentNode.body.appendChild(style)
   } catch (e) {
     console.warn("Unable to get widget DOM element. Widget:", widget, e)
   }
@@ -161,6 +161,22 @@ context.global.injectFontFace = injectFontFace
     lang: 'javascript',
     name: 'Font face injection',
     desc: "Makes a font available inside a widget. Could be used for an HTML widget or a custom widget. Only use this if the Text widget doesn't solve your use case",
+    favourite: false,
+  },
+
+  {
+    code: `type ExmapleArgs = {
+  name: string;
+  value: number;
+};
+function typescriptExample(args: ExmapleArgs) {
+  // Type annotations ar removed on copy / insert
+  // No transforms are applied, no downleveling to ES6 etc occurs
+  console.log(args.name, args.value);
+}`,
+    context: 'shared',
+    lang: 'typescript',
+    name: 'Typescript example',
     favourite: false,
   },
 ];

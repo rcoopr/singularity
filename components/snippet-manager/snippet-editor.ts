@@ -1,5 +1,5 @@
 import { Snippet } from '@/utils/snippets/repo';
-import { dateFormat, html, writeToClipboard } from '@/utils/misc';
+import { dateTimeFormat, html, writeToClipboard } from '@/utils/misc';
 import { BundledTheme } from 'shiki';
 import { options } from '@/utils/preferences/storage';
 import { langAbbreviations } from '@/utils/misc';
@@ -103,12 +103,12 @@ function appendMetadata(root: HTMLElement, snippet: Snippet) {
 
   if (snippet.updatedAt) {
     metadata.innerHTML += html`<span class="snippet-date"
-      >Updated:<wbr /> ${dateFormat.format(snippet.updatedAt)}</span
+      >Updated:<wbr /> ${dateTimeFormat.format(snippet.updatedAt)}</span
     >`;
   }
 
   metadata.innerHTML += html`
-    <span class="snippet-date">Created:<wbr /> ${dateFormat.format(snippet.createdAt)}</span>
+    <span class="snippet-date">Created:<wbr /> ${dateTimeFormat.format(snippet.createdAt)}</span>
   `;
 
   const langIndicator = document.createElement('div');

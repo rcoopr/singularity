@@ -12,7 +12,7 @@ export async function writeToClipboard(text: string) {
   await navigator.clipboard.write(data);
 }
 
-export const dateFormat = new Intl.DateTimeFormat(undefined, {
+export const dateTimeFormat = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
   timeStyle: 'short',
 });

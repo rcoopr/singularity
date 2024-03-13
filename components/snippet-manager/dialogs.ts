@@ -195,7 +195,7 @@ export async function exportSnippets() {
   const a = document.createElement('a');
   a.style.display = 'none';
   a.href = url;
-  a.download = 'snippets.json';
+  a.download = `singularity-${new Date().toISOString().split('T')[0]}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
