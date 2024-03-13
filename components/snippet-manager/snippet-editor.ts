@@ -51,7 +51,7 @@ async function renderSnippetCode(
   if (!snippetPreview) {
     snippetPreview = document.createElement('div');
     snippetPreview.id = 'snippet';
-    snippetPreview.classList.add('h-full', 'animate-in', 'fade-in', 'relative', 'group');
+    snippetPreview.className = 'h-full animate-in fade-in duration-500 relative group';
   }
 
   await loadSelectedTheme();

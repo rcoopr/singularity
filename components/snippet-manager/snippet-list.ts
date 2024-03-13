@@ -37,7 +37,7 @@ export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
 
   for (const folder of folders) {
     const folderContainer = document.createElement('div');
-    folderContainer.classList.add('folder', 'open');
+    folderContainer.className = 'folder open animate-in fade-in duration-500';
 
     const folderHeader = document.createElement('button');
     folderHeader.className = 'folder-header';

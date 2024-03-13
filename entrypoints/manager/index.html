@@ -8,6 +8,7 @@
     <link href="~/assets/tailwind.css" rel="stylesheet" />
     <link href="~/assets/ui.css" rel="stylesheet" />
     <link href="~/assets/controls.css" rel="stylesheet" />
+    <link href="./styles.css" rel="stylesheet" />
   </head>
   <body class="justify-center min-h-screen dark">
     <div id="app" class="h-screen grid gap-4 grid-rows-[auto,1fr,auto] overflow-hidden">
@@ -37,7 +38,10 @@
               <header
                 class="flex items-center flex-wrap justify-between gap-4 bg-fg/10 rounded-md p-2"
               >
-                <h2 id="snippet-description" class="font-semibold mx-2"></h2>
+                <h2
+                  id="snippet-description"
+                  class="font-semibold mx-2 animate-in fade-in duration-500"
+                ></h2>
                 <div class="ml-auto flex flex-wrap items-center justify-end gap-2">
                   <button id="edit-snippet">Edit Snippet</button>
                   <button id="delete-snippet">Delete</button>
@@ -50,7 +54,10 @@
         <!-- <section id="keybinds-manager"></section> -->
       </main>
       <footer class="flex gap-4 justify-between items-end">
-        <section id="options" class="flex flex-wrap gap-4 items-stretch"></section>
+        <section
+          id="options"
+          class="flex flex-wrap gap-4 items-stretch animate-in fade-in duration-500"
+        ></section>
         <div class="flex flex-wrap flex-col gap-2 justify-between items-end">
           <div class="flex flex-wrap gap-2">
             <button class="px-1.5 py-0.5" id="import-export">Import / Export</button>

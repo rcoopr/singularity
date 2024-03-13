@@ -1,4 +1,3 @@
-import './styles.css';
 import { enableSplitPanelInteractivity } from '@/components/snippet-manager/split-pane';
 import { appendControls } from '@/components/quick-options/quick-options';
 import { initSnippetList } from '@/components/snippet-manager/snippet-list';
