@@ -9,6 +9,7 @@ type OptionName = keyof typeof options;
 // TODO: add bulk import/export/delete/restore to default options
 const createOptionControls: Record<OptionName, () => Promise<HTMLElement>> = {
   theme: createThemeControls,
+  useFavourites: createUseFavouritesToggle,
 };
 
 export async function appendControls(
@@ -70,4 +71,28 @@ function createThemeOptionGroups() {
 
 function createThemeOptions(themes: typeof bundledThemesInfo) {
   return themes.map((theme) => html`<option value="${theme.id}">${theme.displayName}</option>`);
+}
+
+async function createUseFavouritesToggle() {
+  const container = document.createElement('div');
+  container.classList.add('flex', 'flex-col');
+  container.innerHTML = html`
+    <label for="color-theme" class="label">Only show favourites in context menus</label>
+    <div class="flex items-center flex-1">
+      <input type="checkbox" class="w-6 h-6 accent-btn-bg" />
+    </div>
+  `;
+
+  const checkbox = container.querySelector<HTMLInputElement>('input')!;
+  const useFavourites = await options.useFavourites.getValue();
+  checkbox.checked = useFavourites;
+
+  checkbox.addEventListener('change', async (e) => {
+    const target = e.currentTarget as HTMLInputElement;
+    await options.useFavourites.setValue(!!target.checked);
+  });
+
+  options.useFavourites.watch((fav) => (checkbox.checked = fav));
+
+  return container;
 }

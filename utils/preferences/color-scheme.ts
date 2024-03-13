@@ -1,10 +1,15 @@
 import { bundledColors } from '@/utils/shiki/bundled-colors';
-import { bundledThemesInfo, BundledTheme, bundledThemes } from 'shiki';
+import { bundledThemesInfo, BundledTheme } from 'shiki';
 
 export function prefersDark() {
-  return typeof window === undefined
-    ? true
-    : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  try {
+    return typeof window === undefined
+      ? true
+      : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } catch (e) {
+    log.debug('Error in prefersDark', e);
+  }
+  return true;
 }
 
 export async function updatePageTheme(theme: BundledTheme) {

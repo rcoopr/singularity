@@ -10,6 +10,7 @@ import {
 } from '@/utils/snippets/repo';
 import type { SetRequired } from 'type-fest';
 import { registerUpdateContextMenuRepo } from '@/utils/context-menus/repo';
+import { options } from '@/utils/preferences/storage';
 
 export default defineBackground(() => {
   const INSERT_SNIPPET_ID = 'insert-snippet';
@@ -69,9 +70,12 @@ export default defineBackground(() => {
     // }
 
     try {
+      const useFavourites = await options.useFavourites.getValue();
       const [all] = await Promise.all([
         // await getAllRelevantSnippets(),
-        (await snippetsRepo.getAll()).filter((snippet) => snippet.favourite),
+        (
+          await snippetsRepo.getAll()
+        ).filter((snippet) => (useFavourites ? snippet.favourite : true)),
         await browser.contextMenus.removeAll(),
       ]);
       contextMenuItemMap = {};

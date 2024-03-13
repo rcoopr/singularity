@@ -238,7 +238,7 @@ dialog {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   padding: 2rem;
   backdrop-filter: blur(10px);
-  background: rgba(244, 244, 245, 0.3);
+  background: rgba(244, 244, 245, 0.8);
   color: theme('colors.zinc.700');
   /* max-width: 400px; */
   /* background-color: #fff; */

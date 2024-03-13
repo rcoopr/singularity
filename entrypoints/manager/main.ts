@@ -13,7 +13,7 @@ import { updatePageTheme } from '@/utils/preferences/color-scheme';
 
 const optionsEl = document.querySelector<HTMLDivElement>('#options');
 
-appendControls(optionsEl, ['theme']);
+appendControls(optionsEl, ['theme', 'useFavourites']);
 initSnippetList();
 enableSplitPanelInteractivity();
 initDialogs();
