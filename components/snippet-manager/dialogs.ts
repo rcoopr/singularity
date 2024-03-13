@@ -60,7 +60,6 @@ export function initDialogs() {
     triggerButton?.addEventListener('click', () => importExportDialog.showModal());
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log(e.currentTarget);
       const formData = new FormData(e.currentTarget as HTMLFormElement);
       const file = formData.get('import') as File;
       if (file) {
