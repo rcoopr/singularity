@@ -99,7 +99,7 @@ export function initDialogs() {
 }
 
 export function updateDialogs(selectedSnippet: Snippet | undefined) {
-  const dialogs = document.querySelectorAll('dialog');
+  const dialogs = document.querySelectorAll<HTMLDialogElement>('dialog.dialog-snippet');
   // TODO: handle radio buttons
   for (const dialog of dialogs) {
     if (dialog.dataset.trigger?.includes('edit')) {

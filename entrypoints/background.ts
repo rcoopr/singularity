@@ -11,6 +11,7 @@ import {
 import type { SetRequired } from 'type-fest';
 import { registerUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 import { options } from '@/utils/preferences/storage';
+import { defaultSnippets } from '@/utils/snippets/default-snippets';
 
 export default defineBackground(() => {
   const INSERT_SNIPPET_ID = 'insert-snippet';
@@ -45,7 +46,7 @@ export default defineBackground(() => {
   // TODO: replace with prompt in sidebar if empty. Good for dev though
   browser.runtime.onInstalled.addListener(async (details) => {
     if (!details.previousVersion) {
-      // await snippetsRepo.import(defaultSnippets);
+      await snippetsRepo.import(defaultSnippets);
     }
 
     await createContextMenus();
