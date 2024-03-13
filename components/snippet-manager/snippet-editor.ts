@@ -20,7 +20,7 @@ function updateHeader(snippet: Snippet | undefined) {
   if (!description) return;
 
   description.innerHTML =
-    snippet?.name || html`<span class="text-zinc-400 italic">No description</span>`;
+    snippet?.desc || html`<span class="text-zinc-400 italic">No description</span>`;
 }
 
 let storedSnippet: Snippet | undefined;
@@ -67,7 +67,7 @@ async function renderSnippetCode(
   copyButton.addEventListener('click', async () => {
     let code = selectedSnippet.code;
     if (selectedSnippet.lang === 'typescript') {
-      code = transpile(code);
+      code = transpile(code).trim();
       copyButton.style.setProperty('--content', '"Transpiled & copied!"');
     } else {
       copyButton.style.setProperty('--content', '"Copied!"');

@@ -143,7 +143,7 @@ export function updateDialogs(selectedSnippet: Snippet | undefined) {
 async function addSnippetFormHandler(formData: FormData) {
   const name = formData.get('name')?.toString() ?? '';
   const code = formData.get('code')?.toString() ?? '';
-  const desc = formData.get('description')?.toString() ?? '';
+  const desc = formData.get('desc')?.toString() ?? '';
   const favourite = Boolean(formData.get('favourite'));
   const contextStr = formData.get('context')?.toString() ?? '';
   const context = isSnippetContext(contextStr) ? contextStr : 'composition';
@@ -162,7 +162,7 @@ async function editSnippetFormHandler(formData: FormData) {
   }
   const name = formData.get('name')?.toString() ?? '';
   const code = formData.get('code')?.toString() ?? '';
-  const desc = formData.get('description')?.toString() ?? '';
+  const desc = formData.get('desc')?.toString() ?? '';
   const favourite = Boolean(formData.get('favourite'));
   const contextStr = formData.get('context')?.toString() ?? '';
   const context = isSnippetContext(contextStr) ? contextStr : 'composition';
