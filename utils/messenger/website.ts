@@ -1,3 +1,5 @@
+import { KeybindPreset } from '@/utils/keybindings/keybindings';
+import { Platform } from '@/utils/preferences/storage';
 import { Snippet, SnippetContext } from '@/utils/snippets/repo';
 import { defineCustomEventMessaging } from '@webext-core/messaging/page';
 
@@ -10,6 +12,9 @@ export interface WebsiteMessengerProtocol {
 
   // Insert snippet into active element
   insert(data: Snippet['code']): void;
+
+  // Enable keybindings for the given preset
+  enableKeybinds(data: { preset: KeybindPreset; platform: Platform }): void;
 }
 
 export const websiteMessenger = defineCustomEventMessaging<WebsiteMessengerProtocol>({

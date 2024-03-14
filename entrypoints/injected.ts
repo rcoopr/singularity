@@ -1,5 +1,5 @@
 import { AceSelectionEventHandler } from '@/types/ace';
-import { getUpdateContextMenuRepo } from '@/utils/context-menus/repo';
+import { enableKeybinds } from '@/utils/keybindings/keybindings';
 import { websiteMessenger } from '@/utils/messenger/website';
 import { SnippetContext } from '@/utils/snippets/repo';
 
@@ -19,6 +19,10 @@ export default defineUnlistedScript(() => {
       insertIntoActiveElement(message.data);
     }
   });
+
+  websiteMessenger.onMessage('enableKeybinds', (message) => {
+    log.debug('enableKeybinds (injected <- content)', message);
+  });
 });
 
 const tabNameContextMap = {
@@ -30,6 +34,11 @@ async function initCursorTracking() {
   const el = await waitForEl<HTMLElement>('#jsonEditor-script');
   if (el) {
     const editor = window.ace.edit(el);
+
+    if (editor) {
+      log.debug('hacky enable keybinds test');
+      enableKeybinds(editor, 'vscode');
+    }
 
     const cursorChangeHandler: AceSelectionEventHandler<'changeCursor'> = (_event, details) => {
       log.debug('Cursor position:', details.lead.row, details.lead.column);

@@ -45,7 +45,7 @@ export default defineBackground(() => {
 
   // TODO: replace with prompt in sidebar if empty. Good for dev though
   browser.runtime.onInstalled.addListener(async (details) => {
-    if (!details.previousVersion) {
+    if (!details.previousVersion && (await snippetsRepo.count()) === 0) {
       await snippetsRepo.import(defaultSnippets);
     }
 
@@ -55,6 +55,20 @@ export default defineBackground(() => {
   browser.tabs.onActivated.addListener(async (info) => {
     currentTab = info.tabId;
     await createContextMenus();
+  });
+
+  options.keybindings.watch(async (preset) => {
+    log.debug('keybindings changed', preset);
+    if (!preset) return;
+
+    if (!(await options.platform.getValue())) {
+      await options.platform.setValue((await browser.runtime.getPlatformInfo()).os);
+    }
+
+    // backgroundMessenger.sendMessage('enableKeybinds', {
+    //   preset,
+    //   platform: await options.platform.getValue(),
+    // });
   });
 
   // HMR will also trigger this

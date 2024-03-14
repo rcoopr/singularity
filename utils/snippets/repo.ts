@@ -6,6 +6,7 @@ import groupBy from 'object.groupby';
 import { getUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 
 export type SnippetsRepo = {
+  count(): Promise<number>;
   createOrUpdate(snippet: SnippetInput): Promise<Snippet | undefined>;
   update(id: Snippet['id'], snippet: SnippetUpdate): Promise<Snippet | undefined>;
   delete(id: Snippet['id']): Promise<void>;
@@ -34,6 +35,9 @@ export type SnippetUpdate = Partial<Omit<Snippet, 'id' | 'createdAt' | 'updatedA
 
 function createSnippetsRepo(db: Promise<IDBPDatabase>): SnippetsRepo {
   return {
+    async count() {
+      return (await db).count('snippets');
+    },
     async createOrUpdate(snippet) {
       const snippetWithDefaults = {
         ...snippet,

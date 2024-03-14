@@ -2,15 +2,23 @@ import { bundledColors } from '@/utils/shiki/bundled-colors';
 import { bundledThemesInfo, BundledTheme } from 'shiki';
 
 export function prefersDark() {
-  try {
-    return typeof window === undefined
-      ? true
-      : window.matchMedia('(prefers-color-scheme: dark)').matches;
-  } catch (e) {
-    log.debug('Error in prefersDark', e);
-  }
   return true;
 }
+// export function prefersDark() {
+//   try {
+//     if (typeof window == undefined) {
+//       console.log('undefineddddd');
+//       return true;
+//     }
+
+//     return typeof window === undefined
+//       ? true
+//       : window.matchMedia('(prefers-color-scheme: dark)').matches;
+//   } catch (e) {
+//     log.debug('Error in prefersDark', e);
+//   }
+//   return true;
+// }
 
 export async function updatePageTheme(theme: BundledTheme) {
   const themeInfo = bundledThemesInfo.find((t) => t.id === theme);

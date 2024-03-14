@@ -3,13 +3,15 @@ import { options } from '@/utils/preferences/storage';
 import { BundledTheme, bundledThemesInfo } from 'shiki';
 import { prefersDark } from '@/utils/preferences/color-scheme';
 import { log } from '@/utils/log';
+import { KeybindPreset, keybinds } from '@/utils/keybindings/keybindings';
 
-type OptionName = keyof typeof options;
+type OptionName = Exclude<keyof typeof options, 'platform'>;
 
 // TODO: add bulk import/export/delete/restore to default options
 const createOptionControls: Record<OptionName, () => Promise<HTMLElement>> = {
   theme: createThemeControls,
   useFavourites: createUseFavouritesToggle,
+  keybindings: createKeybindsSelection,
 };
 
 export async function appendControls(
@@ -93,6 +95,30 @@ async function createUseFavouritesToggle() {
   });
 
   options.useFavourites.watch((fav) => (checkbox.checked = fav));
+
+  return container;
+}
+
+async function createKeybindsSelection() {
+  const container = document.createElement('div');
+  container.classList.add('flex', 'flex-col', 'grow');
+  container.innerHTML = html`
+    <label for="keybindings" class="label">Keybindings</label>
+    <select id="keybindings" class="select sm:max-w-max">
+      <option value="">Default</option>
+      ${keybinds.map((preset) => html`<option value="${preset.id}">${preset.displayName}</option>`)}
+    </select>
+  `;
+
+  const keybindsSelect = container.querySelector<HTMLSelectElement>('#keybindings')!;
+  const preset = await options.keybindings.getValue();
+  keybindsSelect.value = preset || '';
+  keybindsSelect.addEventListener('change', (e) => {
+    const target = e.currentTarget as HTMLSelectElement;
+    options.keybindings.setValue((target.value || null) as KeybindPreset);
+  });
+
+  options.keybindings.watch((preset) => (keybindsSelect.value = preset || ''));
 
   return container;
 }
