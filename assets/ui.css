@@ -36,6 +36,10 @@ body:where(.dark) {
   --bg: 25 23 36;
 }
 
+body > * {
+  @apply transition-colors duration-500;
+}
+
 #app {
   width: 100%;
   padding: 2rem;

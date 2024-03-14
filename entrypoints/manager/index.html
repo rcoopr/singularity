@@ -36,18 +36,27 @@
             <div class="separator cursor-col-resize bg-no-repeat bg-center w-2 select-none"></div>
             <div class="split-panel w-[75%]">
               <header
-                class="flex items-center flex-wrap justify-between gap-4 bg-fg/10 rounded-md p-2"
+                class="flex items-center justify-between gap-4 bg-fg/10 rounded-md p-2 @container"
               >
                 <h2
                   id="snippet-description"
-                  class="font-semibold mx-2 animate-in fade-in duration-500"
+                  class="font-semibold mx-2 animate-in fade-in duration-500 line-clamp-5"
                 ></h2>
-                <div class="ml-auto flex flex-wrap items-center justify-end gap-2">
-                  <button id="edit-snippet">Edit Snippet</button>
-                  <button id="delete-snippet">Delete</button>
+                <div
+                  class="w-min ml-auto flex gap-2 flex-col @sm:flex-row items-center content-center"
+                >
+                  <button class="px-1 py-0.5 @sm:px-4 @sm:py-2 w-full" id="edit-snippet">
+                    Edit
+                  </button>
+                  <button class="px-1 py-0.5 @sm:px-4 @sm:py-2 w-full" id="delete-snippet">
+                    Delete
+                  </button>
                 </div>
               </header>
-              <section id="snippet-editor" class="grow rounded-md overflow-hidden"></section>
+              <section
+                id="snippet-editor"
+                class="grow rounded-md overflow-hidden relative border border-fg/20"
+              ></section>
             </div>
           </div>
         </section>

@@ -58,7 +58,7 @@ export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
 
       folderItem.dataset.id = snippet.id;
       folderItem.classList.add('folder-item');
-      folderItemButton.innerHTML = html`<span class="px-2 py-1">${snippet.name}</span>`;
+      folderItemButton.innerHTML = html`<span class="px-2">${snippet.name}</span>`;
       folderItemButton.className = 'bg-fg/20';
 
       folderItem.appendChild(folderItemButton);

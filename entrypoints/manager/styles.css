@@ -1,4 +1,5 @@
 .shiki {
+  overflow: auto;
   padding: 1rem;
   height: 100%;
   border-radius: theme('borderRadius.md');
@@ -20,6 +21,10 @@
 
 .folder {
   margin-bottom: 1rem;
+}
+
+.folder:last-child {
+  margin-bottom: 0;
 }
 
 .folder-header {
@@ -75,28 +80,29 @@
   gap: 0.25rem;
   overflow: hidden;
 }
+.folder-items > li {
+  height: 2rem;
+}
 .folder-items > li:last-child {
   /* stops active styles overflowing */
   margin-bottom: 1px;
 }
 
-.folder-item:focus {
-  outline: 2px solid rgb(var(--btn-bg));
-  outline-offset: -2px;
-}
 .folder-item > button {
   width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   text-align: left;
   padding: 0;
   cursor: pointer;
+  color: rgb(var(--fg));
+  border-color: rgb(var(--fg) / 0.1);
+}
+.folder-item > button > span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: rgb(var(--fg));
-  border-color: rgb(var(--fg) / 0.1);
 }
 .folder-item > button:hover {
   z-index: 2;
@@ -108,11 +114,14 @@
 }
 
 .folder-item > button:focus,
+.folder-item:focus-within > button,
 .folder-item.selected > button {
   outline: none;
-  border-color: rgb(var(--btn-fg) / 0.4);
-  background-color: rgb(var(--btn-bg));
+  background-color: rgb(var(--btn-bg) / 0.7);
   color: rgb(var(--btn-fg));
+}
+.folder-item.selected > button {
+  background-color: rgb(var(--btn-bg));
 }
 .folder-item > button:focus,
 .folder-item > button:focus:hover,
@@ -120,27 +129,34 @@
   border-color: rgb(var(--fg) / 0.3);
 }
 
-.folder-item:hover .favourite {
+.folder-item:hover .favourite,
+.folder-item:focus-within .favourite {
+  display: block;
   opacity: 1;
 }
 .favourite {
-  opacity: 0;
+  display: none;
   padding: 0.25rem;
-  margin: 2px;
+  margin: 3px;
+  margin-left: auto;
   border-radius: theme('borderRadius.DEFAULT');
   border: none;
   background: transparent;
   @apply transition-all;
 }
+
 .favourite:hover {
+  display: block;
   background: rgb(var(--btn-fg) / 0.3);
 }
 .favourite:focus {
+  display: block;
   outline: none;
   opacity: 1;
   background: rgb(var(--btn-fg) / 0.3);
 }
 .favourite:active {
+  display: block;
   transform: translateY(0) scale(1.1);
 }
 
@@ -154,6 +170,7 @@
 .favourite[data-checked='true'],
 .favourite[data-checked='true'] .star .fill {
   opacity: 1;
+  display: block;
 }
 
 button.copy {
@@ -162,8 +179,8 @@ button.copy {
 
   --content: 'Copied!';
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 1.25rem;
+  right: 1.25rem;
   z-index: 3;
   width: 2.5rem;
   height: 2.5rem;
@@ -173,12 +190,13 @@ button.copy {
   background-size: 20px;
   background-repeat: no-repeat;
   transition: border-color 0.25s, background-color 0.25s, opacity 0.25s;
-  border-color: rgb(0 0 0 / 0.1);
-  background-color: rgb(0 0 0 / 0.07);
+  color: rgb(var(--btn-fg) / 0.3);
+  border-color: rgb(var(--btn-bg) / 0.2);
+  background-color: rgb(var(--btn-bg) / 0.1);
 }
-body:where(.dark) button.copy {
-  border-color: rgb(0 0 0 / 0.1);
-  background-color: rgb(0 0 0 / 0.2);
+button.copy:hover {
+  border-color: rgb(var(--btn-bg) / 0.3);
+  background-color: rgb(var(--btn-bg) / 0.2);
 }
 
 button.copied {
@@ -197,12 +215,9 @@ button.copy::before {
   opacity: 0;
   transition: opacity 0.25s;
   pointer-events: none;
-  border-color: rgb(0 0 0 / 0.1);
-  background-color: rgb(0 0 0 / 0.07);
-}
-body:where(.dark) button.copy::before {
-  border-color: rgb(0 0 0 / 0.1);
-  background-color: rgb(0 0 0 / 0.2);
+  color: rgb(var(--fg));
+  border: 1px solid rgb(var(--btn-bg) / 0.2);
+  background-color: rgb(var(--btn-bg) / 0.1);
 }
 
 button.copied::before {
@@ -346,40 +361,6 @@ dialog #delete-snippet-form button[type='submit']:hover {
   place-content: center;
   font-size: 1.25rem;
   font-style: italic;
-}
-
-#snippet-editor pre {
-  position: relative;
-}
-#snippet-editor pre::after,
-#snippet-editor .metadata::after {
-  border-color: black;
-  opacity: 0.2;
-}
-body:where(.dark) #snippet-editor pre::after,
-body:where(.dark) #snippet-editor .metadata::after {
-  opacity: 0.8;
-  border-color: white;
-  mix-blend-mode: overlay;
-}
-#snippet-editor pre::after,
-#snippet-editor .metadata::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  border-style: solid;
-  z-index: 1;
-}
-#snippet-editor pre::after {
-  border-width: 1px;
-  border-radius: theme('borderRadius.md');
-}
-#snippet-editor .metadata::after {
-  border-top-width: 1px;
 }
 
 #snippet-editor .metadata {

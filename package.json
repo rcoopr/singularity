@@ -15,6 +15,7 @@
     "postinstall": "wxt prepare"
   },
   "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
     "@types/ace": "^0.0.52",
     "@types/object.groupby": "^1.0.3",
     "autoprefixer": "^10.4.18",

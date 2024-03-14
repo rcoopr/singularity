@@ -51,7 +51,8 @@ async function renderSnippetCode(
   if (!snippetPreview) {
     snippetPreview = document.createElement('div');
     snippetPreview.id = 'snippet';
-    snippetPreview.className = 'h-full animate-in fade-in duration-500 relative group';
+    snippetPreview.className =
+      'h-full animate-in fade-in duration-500 relative group flex flex-col';
   }
 
   await loadSelectedTheme();
@@ -63,7 +64,7 @@ async function renderSnippetCode(
   snippetPreview.innerHTML = codeHtml;
 
   const copyButton = document.createElement('button');
-  copyButton.classList.add('copy', 'opacity-0', 'group-hover:opacity-100');
+  copyButton.className = 'copy opacity-0 group-hover:opacity-100';
   copyButton.addEventListener('click', async () => {
     let code = selectedSnippet.code;
     if (selectedSnippet.lang === 'typescript') {
@@ -78,6 +79,7 @@ async function renderSnippetCode(
     copyButton.classList.add('copied');
     window.setTimeout(() => copyButton.classList.remove('copied'), 3000);
   });
+
   snippetPreview.prepend(copyButton);
 
   appendMetadata(snippetPreview, selectedSnippet);
@@ -94,12 +96,8 @@ export async function updateEditorTheme(theme: BundledTheme) {
 }
 
 function appendMetadata(root: HTMLElement, snippet: Snippet) {
-  const pre = root.querySelector('pre');
-  const color = pre?.style.color;
-  const backgroundColor = pre?.style.backgroundColor;
-
   const metadata = document.createElement('div');
-  metadata.classList.add('metadata');
+  metadata.className = 'flex flex-wrap justify-end gap-x-4 relative border-t border-fg/20 px-1';
 
   if (snippet.updatedAt) {
     metadata.innerHTML += html`<span class="snippet-date"
@@ -108,22 +106,15 @@ function appendMetadata(root: HTMLElement, snippet: Snippet) {
   }
 
   metadata.innerHTML += html`
-    <span class="snippet-date">Created:<wbr /> ${dateTimeFormat.format(snippet.createdAt)}</span>
+    <span class="snippet-date text-fg bg-bg"
+      >Created:<wbr /> ${dateTimeFormat.format(snippet.createdAt)}</span
+    >
   `;
 
   const langIndicator = document.createElement('div');
   langIndicator.className =
-    'absolute m-3 bottom-full right-0 text-sm font-bold not-italic text-zinc-900 dark:text-zinc-100 opacity-40';
+    'absolute bottom-full right-0 mb-4 mr-5 text-sm font-bold not-italic text-fg opacity-40';
   langIndicator.textContent = langAbbreviations[snippet.lang];
-
-  if (color) {
-    metadata.style.color = color;
-    langIndicator.style.color = color;
-  }
-  if (backgroundColor) {
-    // metadata.style.backgroundColor = backgroundColor;
-    // document.body.style.backgroundColor = backgroundColor;
-  }
 
   metadata.appendChild(langIndicator);
   root.appendChild(metadata);
