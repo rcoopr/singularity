@@ -5,6 +5,7 @@ import { createSemaphore } from '@/utils/semaphore';
 import {
   Snippet,
   SnippetContext,
+  SnippetInput,
   groupSnippetsByContext,
   registerSnippetsRepo,
 } from '@/utils/snippets/repo';
@@ -17,11 +18,11 @@ export default defineBackground(() => {
   const INSERT_SNIPPET_ID = 'insert-snippet';
   type SnippetCreateArgs = [
     SetRequired<Partial<Parameters<typeof browser.contextMenus.create>[0]>, 'id'>,
-    Snippet | string | number
+    Snippet | SnippetInput | string | number
   ];
 
   let contextMenuListenerAdded = false;
-  let contextMenuItemMap: Record<string, Snippet | string | number> = {};
+  let contextMenuItemMap: Record<string, Snippet | SnippetInput | string | number> = {};
   let parentMenuCreated = false;
   let currentTab: number | undefined = undefined;
   const tabContexts: Record<number, SnippetContext | null> = {};
@@ -132,6 +133,13 @@ export default defineBackground(() => {
           `${context}-header`,
         ]);
 
+        if (group.context === 'global') {
+          subMenuItems.push([
+            { id: 'meta__global-utils', title: 'All utils' },
+            createGlobalBoilerplateWithUtilsSnippet(group.snippets),
+          ]);
+        }
+
         for (const snippet of snippets ?? []) {
           subMenuItems.push([{ id: snippet.id, title: snippet.name }, snippet]);
         }
@@ -188,3 +196,27 @@ export default defineBackground(() => {
     });
   }
 });
+
+// TODO: make this more flexible and expose as options to the user
+function createGlobalBoilerplateWithUtilsSnippet(snippets: Snippet[]): SnippetInput {
+  const utils = snippets
+    .filter((snippet) => snippet.name !== 'Init' && snippet.name !== 'Boilerplate')
+    .map((snippet) => snippet.code.split('\n').join('\n\t\t\t'))
+    .join('\n\n\t\t\t');
+
+  return {
+    code: `(function() {
+  return {
+    init: function(context) {
+      ${utils}
+    },
+    close: function(comp, context) {}
+  };
+})();
+`,
+    context: 'global',
+    lang: 'javascript',
+    name: 'Boilderplate & all utils',
+    desc: 'Global script with all global snippets in one',
+  };
+}

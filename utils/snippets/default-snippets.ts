@@ -165,11 +165,11 @@ context.global.injectFontFace = injectFontFace
   },
 
   {
-    code: `type ExmapleArgs = {
+    code: `type ExampleArgs = {
   name: string;
   value: number;
 };
-function typescriptExample(args: ExmapleArgs) {
+function typescriptExample(args: ExampleArgs) {
   // Type annotations ar removed on copy / insert
   // No transforms are applied, no downleveling to ES6 etc occurs
   console.log(args.name, args.value);

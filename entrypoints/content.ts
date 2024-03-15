@@ -6,7 +6,7 @@ import { PublicPath } from 'wxt/browser';
 let isInjected = false;
 
 export default defineContentScript({
-  matches: ['*://*.google.com/*', '*://app.singular.live/*'],
+  matches: ['*://app.singular.live/compositions/*'],
   main() {
     log.debug('Content script init');
     injectScript('/injected.js', () => {
