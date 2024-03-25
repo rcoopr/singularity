@@ -224,6 +224,20 @@
           <label>
             <span>Code:</span>
             <textarea class="font-mono mt-2" name="code" required></textarea>
+            <p class="text-fg/80 font-normal italic max-w-prose mt-2">
+              Note: Snippets support
+              <a href="https://macromates.com/manual/en/snippets" target="_blank">
+                TextMate syntax
+              </a>
+              as supported by the Ace editor. You can use
+              <a
+                href="https://github.com/ajaxorg/ace/blob/3e9a61fa465b8e7e3cc0e317f1fbb02c001e6126/src/snippets.js#L30"
+                target="_blank"
+                >these variables</a
+              >
+              prefixed with a $ to insert dynamic values. Any $ symbols in your snippets not part of
+              a replacement should be escaped with a \\
+            </p>
           </label>
           <menu>
             <button type="submit">Save</button>

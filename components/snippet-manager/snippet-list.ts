@@ -1,3 +1,4 @@
+import { updateDialogs } from '@/components/snippet-manager/dialogs';
 import { selectSnippet } from '@/components/snippet-manager/select-snippet';
 import { createIconStar } from '@/components/svg';
 import { defaultSnippets } from '@/utils/snippets/default-snippets';
@@ -48,11 +49,8 @@ export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
     addDefaultSnippetsButton.textContent = 'Add default snippets';
     addDefaultSnippetsButton.addEventListener('click', async () => {
       await snippetsRepo.import(defaultSnippets);
-      console.log('rerender');
-      await renderSnippetList(undefined);
-      if (defaultSnippets[0]?.id) {
-        // await renderSnippetList(await snippetsRepo.getOne(defaultSnippets[0].id));
-      }
+      void renderSnippetList(undefined);
+      void updateDialogs(undefined);
     });
     noSnippetsContainer.appendChild(addDefaultSnippetsButton);
     root.appendChild(noSnippetsContainer);

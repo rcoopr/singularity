@@ -102,22 +102,28 @@ export function updateDialogs(selectedSnippet: Snippet | undefined) {
   const dialogs = document.querySelectorAll<HTMLDialogElement>('dialog.dialog-snippet');
   // TODO: handle radio buttons
   for (const dialog of dialogs) {
+    console.log({ dialog });
     if (dialog.dataset.trigger?.includes('edit')) {
+      const codeInput = dialog.querySelector('textarea');
+      if (codeInput) {
+        codeInput.value = selectedSnippet?.code || '';
+      }
+
       dialog.querySelectorAll('input').forEach((input) => {
         // Reset when no snippet is selected, and don't auto-fill when adding a new snippet
-        if (!selectedSnippet) {
-          input.value = '';
-          return;
-        }
+        // if (!selectedSnippet) {
+        //   input.value = '';
+        //   return;
+        // }
 
-        const value = selectedSnippet[input.name as keyof Snippet];
+        const value = selectedSnippet?.[input.name as keyof Snippet];
         if (input.name === 'lang') {
-          input.checked = input.value === value;
+          input.checked = input.value === (value || 'javascript');
           return;
         }
 
         if (input.name === 'context') {
-          input.checked = input.value === value;
+          input.checked = input.value === (value || 'composition');
           return;
         }
 
@@ -125,12 +131,8 @@ export function updateDialogs(selectedSnippet: Snippet | undefined) {
           input.checked = !!value;
         }
 
-        input.value = selectedSnippet[input.name as keyof Snippet]?.toString() || '';
+        input.value = selectedSnippet?.[input.name as keyof Snippet]?.toString() || '';
       });
-      const codeInput = dialog.querySelector('textarea');
-      if (codeInput && selectedSnippet) {
-        codeInput.value = selectedSnippet.code;
-      }
     } else if (dialog.dataset.trigger?.includes('delete')) {
       const idInput = dialog.querySelector('input');
       if (idInput && selectedSnippet) {

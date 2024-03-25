@@ -7,7 +7,6 @@ export function prefersDark() {
 // export function prefersDark() {
 //   try {
 //     if (typeof window == undefined) {
-//       console.log('undefineddddd');
 //       return true;
 //     }
 
