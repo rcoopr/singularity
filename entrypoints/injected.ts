@@ -1,6 +1,6 @@
 import { AceSelectionEventHandler } from '@/types/ace';
 import { enableKeybinds } from '@/utils/keybindings/keybindings';
-import { websiteMessenger } from '@/utils/messenger/website';
+import { CursorPosition, websiteMessenger } from '@/utils/messenger/website';
 import { SnippetContext } from '@/utils/snippets/repo';
 
 export default defineUnlistedScript(() => {
@@ -16,12 +16,18 @@ export default defineUnlistedScript(() => {
     if (window.ace) {
       insertIntoAceEditor(message.data);
     } else {
-      insertIntoActiveElement(message.data);
+      insertIntoActiveElement(message.data.code);
     }
   });
 
-  websiteMessenger.onMessage('enableKeybinds', (message) => {
+  websiteMessenger.onMessage('enableKeybinds', async (message) => {
     log.debug('enableKeybinds (injected <- content)', message);
+    const editor = await getEditor();
+    if (!editor) {
+      log.warn('No editor found to enable keybinds');
+      return;
+    }
+    enableKeybinds(editor, message.data.preset, message.data.platform);
   });
 });
 
@@ -30,26 +36,35 @@ const tabNameContextMap = {
   'Overlay Script': 'overlay',
 } as const;
 
-async function initCursorTracking() {
+let editor: AceAjax.Editor | undefined = undefined;
+async function getEditor() {
+  if (editor) return editor;
   const el = await waitForEl<HTMLElement>('#jsonEditor-script');
   if (el) {
-    const editor = window.ace.edit(el);
+    editor = window.ace.edit(el);
+  }
+  return editor;
+}
 
-    if (editor) {
-      log.debug('hacky enable keybinds test');
-      enableKeybinds(editor, 'vscode');
-    }
+async function initCursorTracking() {
+  const editor = await getEditor();
+  if (!editor) return;
 
-    const cursorChangeHandler: AceSelectionEventHandler<'changeCursor'> = (_event, details) => {
-      log.debug('Cursor position:', details.lead.row, details.lead.column);
-      websiteMessenger.sendMessage('cursorPosition', {
+  const cursorChangeHandler: AceSelectionEventHandler<'changeCursor'> = (_event, details) => {
+    log.debug('Cursor position:', details.lead.row, details.lead.column);
+    websiteMessenger.sendMessage('cursorPosition', {
+      anchor: {
+        row: details.anchor.row,
+        column: details.anchor.column,
+      },
+      lead: {
         row: details.lead.row,
         column: details.lead.column,
-      });
-    };
+      },
+    });
+  };
 
-    editor.session.selection.on('changeCursor', cursorChangeHandler);
-  }
+  editor.session.selection.on('changeCursor', cursorChangeHandler);
 }
 
 async function initContextTracking() {
@@ -104,15 +119,26 @@ function waitForEl<T extends Element>(selector: string): Promise<T | null | unde
   });
 }
 
-function insertIntoAceEditor(text: string) {
+function insertIntoAceEditor({ code, position }: { code: string; position?: CursorPosition }) {
   try {
     const editor = window.ace.edit('jsonEditor-script');
 
-    const cursorPosition = editor.getCursorPosition();
-    const tabs = Math.ceil(cursorPosition.column / 2);
-    const indentedText = text.split('\n').join(`\n${'\t'.repeat(tabs)}`);
+    // const cursorPosition = position?.anchor || editor.getCursorPosition();
+    // const tabSize = editor.session.getTabSize();
+    // const tabs = Math.ceil(cursorPosition.column / tabSize);
+    // const indentedText = code.split('\n').join(`\n${'\t'.repeat(tabs)}`);
 
-    editor.session.insert(editor.getCursorPosition(), indentedText);
+    if (position) {
+      const range = {
+        start: position.anchor,
+        end: position.lead,
+      };
+      editor.session.selection.setSelectionRange(range);
+      // editor.session.replace(range as AceAjax.Range, '');
+    }
+
+    // @ts-expect-error bad typings, missing method
+    editor.insertSnippet(code);
   } catch (e) {
     log.warn('Error inserting snippet into Ace editor\n', e);
   }

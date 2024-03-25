@@ -1,62 +1,51 @@
 import { backgroundMessenger } from '@/utils/messenger/background';
-import { WebsiteMessengerProtocol, websiteMessenger } from '@/utils/messenger/website';
-import { options } from '@/utils/preferences/storage';
-import { PublicPath } from 'wxt/browser';
+import { websiteMessenger } from '@/utils/messenger/website';
+import { config, options } from '@/utils/preferences/storage';
+import { injectScript } from '../utils/inject-script';
 
 let isInjected = false;
 
 export default defineContentScript({
-  matches: ['*://app.singular.live/compositions/*'],
+  matches: ['*://app.singular.live/compositions/*', '*://www.google.com/*'],
   main() {
     log.debug('Content script init');
+
     injectScript('/injected.js', () => {
       isInjected = true;
-      enableKeybinds();
+      syncKeybindsOption();
     });
 
-    // Injected -> Content Script
+    // Relay messages from Injected -> Content Script
     websiteMessenger.onMessage('context', (message) => {
+      if (!browser.runtime.id) return;
       backgroundMessenger.sendMessage('context', message.data);
     });
 
     websiteMessenger.onMessage('cursorPosition', (message) => {
+      if (!browser.runtime.id) return;
       backgroundMessenger.sendMessage('cursorPosition', message.data);
     });
 
-    // Background -> Content Script
+    // Relay messages from Background -> Content Script
     backgroundMessenger.onMessage('insert', (message) => {
-      log.debug('insert (background -> content -> injected)', message);
-      if (isInjected) websiteMessenger.sendMessage('insert', message.data);
+      if (!isInjected || !browser.runtime.id) return;
+      websiteMessenger.sendMessage('insert', message.data);
     });
 
-    // backgroundMessenger.onMessage('enableKeybinds', (message) => {
-    //   log.debug('enableKeybinds (background -> content -> injected)', message);
-    //   if (isInjected) websiteMessenger.sendMessage('enableKeybinds', message.data);
-    // });
-
-    options.keybindings.watch(() => enableKeybinds());
-    options.platform.watch(() => enableKeybinds());
+    options.keybindings.watch(() => syncKeybindsOption());
+    config.platform.watch(() => syncKeybindsOption());
   },
 });
 
-function injectScript(path: PublicPath, onLoad?: () => void) {
-  const scriptElement = document.createElement('script');
-  scriptElement.src = browser.runtime.getURL(path);
-  scriptElement.onload = () => {
-    if (onLoad) onLoad();
-    scriptElement.remove();
-  };
-  (document.head || document.documentElement).appendChild(scriptElement);
-}
+async function syncKeybindsOption() {
+  if (!browser.runtime.id) return;
 
-async function enableKeybinds() {
-  const platform = await options.platform.getValue();
   const preset = await options.keybindings.getValue();
+  if (!preset) return; // TODO: disable keybinds
 
-  if (preset) {
-    websiteMessenger.sendMessage('enableKeybinds', {
-      preset,
-      platform,
-    });
-  }
+  const platform = await config.platform.getValue();
+  websiteMessenger.sendMessage('enableKeybinds', {
+    preset,
+    platform,
+  });
 }

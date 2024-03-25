@@ -1,5 +1,6 @@
 import { selectSnippet } from '@/components/snippet-manager/select-snippet';
 import { createIconStar } from '@/components/svg';
+import { defaultSnippets } from '@/utils/snippets/default-snippets';
 import { Snippet, getSnippetsRepo, groupSnippetsByContext } from '@/utils/snippets/repo';
 
 var isInitialized = false;
@@ -34,6 +35,29 @@ export async function renderSnippetList(selectedSnippet: Snippet | undefined) {
   const folders = groupSnippetsByContext(await snippetsRepo.getAll());
 
   root.innerHTML = '';
+
+  if (folders.length === 0) {
+    const noSnippetsContainer = document.createElement('div');
+    noSnippetsContainer.className = 'h-full grid place-content-center gap-4';
+    noSnippetsContainer.innerHTML = html`<p class="text-fg/80 text-center">
+      There's nothing here...
+    </p>`;
+
+    const addDefaultSnippetsButton = document.createElement('button');
+    addDefaultSnippetsButton.className = 'bg-fg/20 px-4 py-2 rounded-md';
+    addDefaultSnippetsButton.textContent = 'Add default snippets';
+    addDefaultSnippetsButton.addEventListener('click', async () => {
+      await snippetsRepo.import(defaultSnippets);
+      console.log('rerender');
+      await renderSnippetList(undefined);
+      if (defaultSnippets[0]?.id) {
+        // await renderSnippetList(await snippetsRepo.getOne(defaultSnippets[0].id));
+      }
+    });
+    noSnippetsContainer.appendChild(addDefaultSnippetsButton);
+    root.appendChild(noSnippetsContainer);
+    return;
+  }
 
   for (const folder of folders) {
     const folderContainer = document.createElement('div');

@@ -1,3 +1,4 @@
+import { init } from '@/components/combobox/combobox';
 import { updatePageTheme } from '@/utils/preferences/color-scheme';
 import { options } from '@/utils/preferences/storage';
 
@@ -20,3 +21,5 @@ if (managerLinkEl) {
     });
   });
 }
+
+init(document.querySelector('.custom-combobox')!);

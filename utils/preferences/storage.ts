@@ -1,5 +1,7 @@
 import { KeybindPreset } from '@/utils/keybindings/keybindings';
+import { CursorPosition } from '@/utils/messenger/website';
 import { prefersDark } from '@/utils/preferences/color-scheme';
+import { SnippetContext } from '@/utils/snippets/repo';
 import { BundledTheme } from 'shiki';
 import type { WxtStorageItem } from 'wxt/storage';
 
@@ -7,7 +9,12 @@ export type Preferences = {
   theme: BundledTheme;
   useFavourites: boolean;
   keybindings: KeybindPreset | null;
+};
+
+export type Config = {
   platform: Platform;
+  tabsCursorPosition: Record<string, CursorPosition>;
+  tabsContext: Record<number, SnippetContext | null>;
 };
 
 export const options: {
@@ -22,8 +29,19 @@ export const options: {
   keybindings: storage.defineItem<KeybindPreset | null>('sync:keybindings', {
     defaultValue: null,
   }),
+};
+
+export const config: {
+  [K in keyof Config]: WxtStorageItem<Config[K], {}>;
+} = {
   platform: storage.defineItem<Platform>('local:platform', {
     defaultValue: 'win',
+  }),
+  tabsCursorPosition: storage.defineItem<Config['tabsCursorPosition']>('session:cursorPosition', {
+    defaultValue: {},
+  }),
+  tabsContext: storage.defineItem<Config['tabsContext']>('session:currentContext', {
+    defaultValue: {},
   }),
 };
 

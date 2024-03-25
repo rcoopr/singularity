@@ -112,6 +112,7 @@ async function createKeybindsSelection() {
 
   const keybindsSelect = container.querySelector<HTMLSelectElement>('#keybindings')!;
   const preset = await options.keybindings.getValue();
+
   keybindsSelect.value = preset || '';
   keybindsSelect.addEventListener('change', (e) => {
     const target = e.currentTarget as HTMLSelectElement;

@@ -4,15 +4,13 @@ import { capitalize } from '@/utils/misc';
 import { createSemaphore } from '@/utils/semaphore';
 import {
   Snippet,
-  SnippetContext,
   SnippetInput,
   groupSnippetsByContext,
   registerSnippetsRepo,
 } from '@/utils/snippets/repo';
 import type { SetRequired } from 'type-fest';
 import { registerUpdateContextMenuRepo } from '@/utils/context-menus/repo';
-import { options } from '@/utils/preferences/storage';
-import { defaultSnippets } from '@/utils/snippets/default-snippets';
+import { config, options } from '@/utils/preferences/storage';
 
 export default defineBackground(() => {
   const INSERT_SNIPPET_ID = 'insert-snippet';
@@ -25,7 +23,6 @@ export default defineBackground(() => {
   let contextMenuItemMap: Record<string, Snippet | SnippetInput | string | number> = {};
   let parentMenuCreated = false;
   let currentTab: number | undefined = undefined;
-  const tabContexts: Record<number, SnippetContext | null> = {};
   const semaphore = createSemaphore();
   log.debug('Background script init');
 
@@ -34,42 +31,54 @@ export default defineBackground(() => {
   registerUpdateContextMenuRepo(createContextMenus);
 
   backgroundMessenger.onMessage('context', async (message) => {
+    if (!browser.runtime.id) return;
+
     currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
-    if (currentTab) tabContexts[currentTab] = message.data;
+    if (currentTab) {
+      const tabsContext = await config.tabsContext.getValue();
+      config.tabsContext.setValue({
+        ...tabsContext,
+        [currentTab]: message.data,
+      });
+    }
     log.debug('Context:', message.data, currentTab);
     await createContextMenus();
   });
 
   backgroundMessenger.onMessage('cursorPosition', async (message) => {
+    if (!browser.runtime.id) return;
+
+    currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
+    if (currentTab) {
+      const allTabsCursorPositions = await config.tabsCursorPosition.getValue();
+      config.tabsCursorPosition.setValue({
+        ...allTabsCursorPositions,
+        [currentTab]: message.data,
+      });
+    }
     // store for later use in popup quick-actions
   });
 
-  // TODO: replace with prompt in sidebar if empty. Good for dev though
-  browser.runtime.onInstalled.addListener(async (details) => {
-    if (!details.previousVersion && (await snippetsRepo.count()) === 0) {
-      await snippetsRepo.import(defaultSnippets);
-    }
-
+  browser.runtime.onInstalled.addListener(async () => {
     await createContextMenus();
   });
 
   browser.tabs.onActivated.addListener(async (info) => {
+    if (!browser.runtime.id) return;
+
     currentTab = info.tabId;
     await createContextMenus();
   });
 
   options.keybindings.watch(async (preset) => {
+    if (!browser.runtime.id) return;
+
     log.debug('keybindings changed', preset);
     if (!preset) return;
 
-    if (!(await options.platform.getValue())) {
-      await options.platform.setValue((await browser.runtime.getPlatformInfo()).os);
+    if (!(await config.platform.getValue())) {
+      await config.platform.setValue((await browser.runtime.getPlatformInfo()).os);
     }
-
-    // backgroundMessenger.sendMessage('enableKeybinds', {
-    //   preset,
-    //   platform: await options.platform.getValue(),
-    // });
   });
 
   // HMR will also trigger this
@@ -79,16 +88,9 @@ export default defineBackground(() => {
     // Queue multiple calls to this function
     await semaphore.acquire();
 
-    // async function getAllRelevantSnippets() {
-    //   const snippets = await snippetsRepo.getAll();
-    //   if ((await options.useFavourites.getValue()) === false) return snippets;
-    //   return snippets.filter((snippet) => snippet.favourite);
-    // }
-
     try {
       const useFavourites = await options.useFavourites.getValue();
       const [all] = await Promise.all([
-        // await getAllRelevantSnippets(),
         (
           await snippetsRepo.getAll()
         ).filter((snippet) => (useFavourites ? snippet.favourite : true)),
@@ -98,7 +100,8 @@ export default defineBackground(() => {
       parentMenuCreated = false;
 
       const groupedSnippets = groupSnippetsByContext(all);
-      const currentContext = currentTab ? tabContexts[currentTab] : null;
+      const tabsContext = await config.tabsContext.getValue();
+      const currentContext = currentTab ? tabsContext[currentTab] : null;
       const currentContextGroups = groupedSnippets.find(
         (group) => group.context === currentContext
       );
@@ -161,7 +164,9 @@ export default defineBackground(() => {
               return;
             }
             log.debug('send insert message', snippet.code, tab.id);
-            backgroundMessenger.sendMessage('insert', snippet.code, tab.id);
+            if (tab.id && browser.runtime.id) {
+              backgroundMessenger.sendMessage('insert', { code: snippet.code }, tab.id);
+            }
           }
         });
         contextMenuListenerAdded = true;

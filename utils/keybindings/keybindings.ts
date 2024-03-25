@@ -1,5 +1,6 @@
 import { bindings as sublimeBindings } from '@/utils/keybindings/presets/sublime';
 import { bindings as vscodeBindings } from '@/utils/keybindings/presets/vscode';
+import { Platform } from '@/utils/preferences/storage';
 
 export type KeybindPreset = (typeof keybinds)[number]['id'];
 
@@ -17,7 +18,7 @@ const keybindsMap = Object.fromEntries(keybinds.map((entry) => [entry.id, entry.
 export async function enableKeybinds(
   editor: AceAjax.Editor,
   preset: KeybindPreset,
-  platform: 'mac' | 'win' | 'linux' = 'win'
+  platform: Platform = 'win'
 ) {
   for (const keybind of keybindsMap[preset]) {
     const key =

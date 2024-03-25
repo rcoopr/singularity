@@ -20,7 +20,11 @@ export function prefersDark() {
 //   return true;
 // }
 
+let lastTheme: string | undefined = undefined;
 export async function updatePageTheme(theme: BundledTheme) {
+  if (theme === lastTheme) return;
+  lastTheme = theme;
+
   const themeInfo = bundledThemesInfo.find((t) => t.id === theme);
   log.debug('Updating theme:', themeInfo);
   document.body.classList[themeInfo?.type === 'light' ? 'remove' : 'add']('dark');
