@@ -9,8 +9,8 @@ export default defineContentScript({
   main() {
     log.debug('Content script init');
     if (
-      window.location.origin.includes('//app.singular.live/compositions') ||
-      window.location.origin.includes('//www.google.com')
+      window.location.origin.includes('app.singular.live') ||
+      window.location.origin.includes('www.google.com')
     ) {
       allowWindowMessaging('com.rcoopr.singularity');
     }
