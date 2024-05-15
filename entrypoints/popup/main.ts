@@ -22,4 +22,4 @@ if (managerLinkEl) {
   });
 }
 
-init(document.querySelector('.custom-combobox')!);
+init(document.querySelector('.custom-combobox'));

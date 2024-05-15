@@ -102,7 +102,6 @@ export function updateDialogs(selectedSnippet: Snippet | undefined) {
   const dialogs = document.querySelectorAll<HTMLDialogElement>('dialog.dialog-snippet');
   // TODO: handle radio buttons
   for (const dialog of dialogs) {
-    console.log({ dialog });
     if (dialog.dataset.trigger?.includes('edit')) {
       const codeInput = dialog.querySelector('textarea');
       if (codeInput) {

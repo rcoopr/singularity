@@ -221,7 +221,7 @@ function createGlobalBoilerplateWithUtilsSnippet(snippets: Snippet[]): SnippetIn
 `,
     context: 'global',
     lang: 'javascript',
-    name: 'Boilderplate & all utils',
+    name: 'Boilerplate & all utils',
     desc: 'Global script with all global snippets in one',
   };
 }

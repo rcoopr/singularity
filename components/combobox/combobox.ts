@@ -3,7 +3,9 @@ interface Option {
   quickAction?: () => void;
 }
 
-const initializeCustomCombobox = (comboboxElement: HTMLElement, options: Option[]) => {
+const initializeCustomCombobox = (comboboxElement: HTMLElement | null, options: Option[]) => {
+  if (!comboboxElement) return;
+
   const inputElement = comboboxElement.querySelector('input') as HTMLInputElement;
   const clearButton = comboboxElement.querySelector('.clear-btn') as HTMLButtonElement;
   const dropdownElement = comboboxElement.querySelector('.dropdown') as HTMLDivElement;
@@ -82,6 +84,6 @@ const options: Option[] = [
   { label: 'Option 5' },
 ];
 
-export function init(el: HTMLElement) {
+export function init(el: HTMLElement | null) {
   initializeCustomCombobox(el, options);
 }
