@@ -1,5 +1,5 @@
 import { KeybindPreset } from '@/utils/keybindings/keybindings';
-import { CursorPosition } from '@/utils/messenger/website';
+import { CursorPosition } from '@/types/cursor';
 import { prefersDark } from '@/utils/preferences/color-scheme';
 import { SnippetContext } from '@/utils/snippets/repo';
 import { BundledTheme } from 'shiki';

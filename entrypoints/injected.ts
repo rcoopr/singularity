@@ -1,17 +1,19 @@
 import { AceSelectionEventHandler } from '@/types/ace';
 import { enableKeybinds } from '@/utils/keybindings/keybindings';
-import { CursorPosition, websiteMessenger } from '@/utils/messenger/website';
+import { CursorPosition } from '@/types/cursor';
 import { SnippetContext } from '@/utils/snippets/repo';
+import { onMessage, sendMessage, setNamespace } from 'webext-bridge/window';
 
 export default defineUnlistedScript(() => {
   log.debug('Injected script init');
+  setNamespace('com.rcoopr.singularity');
 
   if (window.ace) {
     initContextTracking();
     initCursorTracking();
   }
 
-  websiteMessenger.onMessage('insert', (message) => {
+  onMessage('insert', (message) => {
     log.debug('insert (injected <- content)', message);
     if (window.ace) {
       insertIntoAceEditor(message.data);
@@ -20,7 +22,7 @@ export default defineUnlistedScript(() => {
     }
   });
 
-  websiteMessenger.onMessage('enableKeybinds', async (message) => {
+  onMessage('enableKeybinds', async (message) => {
     log.debug('enableKeybinds (injected <- content)', message);
     const editor = await getEditor();
     if (!editor) {
@@ -52,16 +54,20 @@ async function initCursorTracking() {
 
   const cursorChangeHandler: AceSelectionEventHandler<'changeCursor'> = (_event, details) => {
     log.debug('Cursor position:', details.lead.row, details.lead.column);
-    websiteMessenger.sendMessage('cursorPosition', {
-      anchor: {
-        row: details.anchor.row,
-        column: details.anchor.column,
+    sendMessage(
+      'cursorPosition',
+      {
+        anchor: {
+          row: details.anchor.row,
+          column: details.anchor.column,
+        },
+        lead: {
+          row: details.lead.row,
+          column: details.lead.column,
+        },
       },
-      lead: {
-        row: details.lead.row,
-        column: details.lead.column,
-      },
-    });
+      'background'
+    );
   };
 
   editor.session.selection.on('changeCursor', cursorChangeHandler);
@@ -70,7 +76,7 @@ async function initCursorTracking() {
 async function initContextTracking() {
   const activeTab = await waitForEl('.code-editor-tab.active');
 
-  websiteMessenger.sendMessage('context', getContextFromTabName(activeTab?.textContent));
+  sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background');
 
   const tabs = await waitForEl('.code-editor-tabs');
   if (tabs && tabs.parentElement) {
@@ -83,7 +89,7 @@ async function initContextTracking() {
         ) {
           const activeTab = mutation.target.querySelector('.code-editor-tab.active');
           log.debug('Active tab:', activeTab?.textContent);
-          websiteMessenger.sendMessage('context', getContextFromTabName(activeTab?.textContent));
+          sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background');
         }
       }
     });

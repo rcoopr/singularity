@@ -1,5 +1,4 @@
 import { openExtensionDatabase } from '@/utils/db';
-import { backgroundMessenger } from '@/utils/messenger/background';
 import { capitalize } from '@/utils/misc';
 import { createSemaphore } from '@/utils/semaphore';
 import {
@@ -11,6 +10,8 @@ import {
 import type { SetRequired } from 'type-fest';
 import { registerUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 import { config, options } from '@/utils/preferences/storage';
+import { onMessage, sendMessage } from 'webext-bridge/background';
+import { isInternalEndpoint } from 'webext-bridge';
 
 export default defineBackground(() => {
   const INSERT_SNIPPET_ID = 'insert-snippet';
@@ -30,8 +31,8 @@ export default defineBackground(() => {
   const snippetsRepo = registerSnippetsRepo(idb);
   registerUpdateContextMenuRepo(createContextMenus);
 
-  backgroundMessenger.onMessage('context', async (message) => {
-    if (!browser.runtime.id) return;
+  onMessage('context', async (message) => {
+    if (!isInternalEndpoint(message.sender)) return;
 
     currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
     if (currentTab) {
@@ -45,7 +46,8 @@ export default defineBackground(() => {
     await createContextMenus();
   });
 
-  backgroundMessenger.onMessage('cursorPosition', async (message) => {
+  onMessage('cursorPosition', async (message) => {
+    if (!isInternalEndpoint(message.sender)) return;
     if (!browser.runtime.id) return;
 
     currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
@@ -149,6 +151,7 @@ export default defineBackground(() => {
       }
 
       await Promise.all(subMenuItems.map((args) => createMenuItem(...args)));
+      log.debug('creating context menus', subMenuItems);
 
       if (!contextMenuListenerAdded) {
         browser.contextMenus.onClicked.addListener((info, tab) => {
@@ -165,7 +168,7 @@ export default defineBackground(() => {
             }
             log.debug('send insert message', snippet.code, tab.id);
             if (tab.id && browser.runtime.id) {
-              backgroundMessenger.sendMessage('insert', { code: snippet.code }, tab.id);
+              sendMessage('insert', { code: snippet.code }, `window@${tab.id}`);
             }
           }
         });
