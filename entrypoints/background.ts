@@ -116,17 +116,11 @@ export default defineBackground(() => {
         const { context, snippets } = group;
 
         if (!parentMenuCreated) {
-          browser.contextMenus.create(
-            {
-              id: INSERT_SNIPPET_ID,
-              title: 'Insert Snippet',
-              contexts: ['editable'],
-            },
-            () => {
-              browser.runtime.lastError &&
-                log.debug('Error creating context menu', browser.runtime.lastError);
-            }
-          );
+          browser.contextMenus.create({
+            id: INSERT_SNIPPET_ID,
+            title: 'Insert Snippet',
+            contexts: ['editable'],
+          });
           parentMenuCreated = true;
         }
 
@@ -168,7 +162,9 @@ export default defineBackground(() => {
             }
             log.debug('send insert message', snippet.code, tab.id);
             if (tab.id && browser.runtime.id) {
-              sendMessage('insert', { code: snippet.code }, `window@${tab.id}`);
+              sendMessage('insert', { code: snippet.code }, `window@${tab.id}`).catch((e) =>
+                log.warn(e)
+              );
             }
           }
         });
@@ -183,7 +179,7 @@ export default defineBackground(() => {
     const entryInMap = contextMenuItemMap[args.id];
     contextMenuItemMap[args.id] = snippet || args.id;
 
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<string>((resolve) => {
       if (entryInMap) resolve(args.id);
 
       browser.contextMenus.create(
@@ -192,14 +188,7 @@ export default defineBackground(() => {
           contexts: ['editable'],
           ...args,
         },
-        () => {
-          if (browser.runtime.lastError) {
-            log.warn('Error creating context menu', browser.runtime.lastError, contextMenuItemMap);
-            reject(browser.runtime.lastError);
-          } else {
-            resolve(args.id);
-          }
-        }
+        () => resolve(args.id)
       );
     });
   }

@@ -67,7 +67,7 @@ async function initCursorTracking() {
         },
       },
       'background'
-    );
+    ).catch((e) => log.warn(e));
   };
 
   editor.session.selection.on('changeCursor', cursorChangeHandler);
@@ -76,7 +76,9 @@ async function initCursorTracking() {
 async function initContextTracking() {
   const activeTab = await waitForEl('.code-editor-tab.active');
 
-  sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background');
+  sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background').catch((e) =>
+    log.warn(e)
+  );
 
   const tabs = await waitForEl('.code-editor-tabs');
   if (tabs && tabs.parentElement) {
@@ -89,7 +91,9 @@ async function initContextTracking() {
         ) {
           const activeTab = mutation.target.querySelector('.code-editor-tab.active');
           log.debug('Active tab:', activeTab?.textContent);
-          sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background');
+          sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background').catch(
+            (e) => log.warn(e)
+          );
         }
       }
     });
@@ -129,18 +133,12 @@ function insertIntoAceEditor({ code, position }: { code: string; position?: Curs
   try {
     const editor = window.ace.edit('jsonEditor-script');
 
-    // const cursorPosition = position?.anchor || editor.getCursorPosition();
-    // const tabSize = editor.session.getTabSize();
-    // const tabs = Math.ceil(cursorPosition.column / tabSize);
-    // const indentedText = code.split('\n').join(`\n${'\t'.repeat(tabs)}`);
-
     if (position) {
       const range = {
         start: position.anchor,
         end: position.lead,
       };
       editor.session.selection.setSelectionRange(range);
-      // editor.session.replace(range as AceAjax.Range, '');
     }
 
     // @ts-expect-error bad typings, missing method
