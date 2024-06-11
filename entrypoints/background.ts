@@ -11,7 +11,7 @@ import type { SetRequired } from 'type-fest';
 import { registerUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 import { config, options } from '@/utils/preferences/storage';
 import { onMessage, sendMessage } from 'webext-bridge/background';
-import { isInternalEndpoint } from 'webext-bridge';
+// import { isInternalEndpoint } from 'webext-bridge';
 
 export default defineBackground(() => {
   const INSERT_SNIPPET_ID = 'insert-snippet';
@@ -32,7 +32,8 @@ export default defineBackground(() => {
   registerUpdateContextMenuRepo(createContextMenus);
 
   onMessage('context', async (message) => {
-    if (!isInternalEndpoint(message.sender)) return;
+    // if (!isInternalEndpoint(message.sender) || !browser.runtime.id) return;
+    if (!browser.runtime.id) return;
 
     currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
     if (currentTab) {
@@ -47,7 +48,7 @@ export default defineBackground(() => {
   });
 
   onMessage('cursorPosition', async (message) => {
-    if (!isInternalEndpoint(message.sender)) return;
+    // if (!isInternalEndpoint(message.sender) || !browser.runtime.id) return;
     if (!browser.runtime.id) return;
 
     currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
@@ -92,7 +93,7 @@ export default defineBackground(() => {
 
     try {
       const useFavourites = await options.useFavourites.getValue();
-      const [all] = await Promise.all([
+      const [all, _] = await Promise.all([
         (
           await snippetsRepo.getAll()
         ).filter((snippet) => (useFavourites ? snippet.favourite : true)),
@@ -134,7 +135,7 @@ export default defineBackground(() => {
 
         if (group.context === 'global') {
           subMenuItems.push([
-            { id: 'meta__global-utils', title: 'All utils' },
+            { id: 'meta__global-utils', title: '· Boilerplate + Snippets' },
             createGlobalBoilerplateWithUtilsSnippet(group.snippets),
           ]);
         }
@@ -196,19 +197,37 @@ export default defineBackground(() => {
 
 // TODO: make this more flexible and expose as options to the user
 function createGlobalBoilerplateWithUtilsSnippet(snippets: Snippet[]): SnippetInput {
+  const assignments: string[] = [];
+
   const utils = snippets
+    .filter((snippet) => snippet.context === 'global' && snippet.favourite)
     .filter((snippet) => snippet.name !== 'Init' && snippet.name !== 'Boilerplate')
-    .map((snippet) => snippet.code.split('\n').join('\n\t\t\t'))
+    .map((snippet) => {
+      const lines = snippet.code.split('\n');
+      let snippetBody: string | undefined;
+      let assignmentsEnded = false;
+      for (let i = 0; assignmentsEnded === false; i++) {
+        if (lines[i].startsWith('context.global')) {
+          assignments.push(lines[i]);
+        } else if (lines[i].trim().length > 0) {
+          assignmentsEnded = true;
+          snippetBody = lines.splice(i).join('\n\t\t\t');
+        }
+      }
+
+      return snippetBody;
+    })
     .join('\n\n\t\t\t');
 
   return {
     code: `(function() {
-  return {
-    init: function(context) {
-      ${utils}
-    },
-    close: function(comp, context) {}
-  };
+\treturn {
+\t\tinit: function(context) {
+\t\t\t${assignments.join('\n\t\t\t')}
+\t\t\t${utils}
+\t\t},
+\t\tclose: function(context) {}
+\t};
 })();
 `,
     context: 'global',

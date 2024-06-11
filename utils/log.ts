@@ -9,5 +9,6 @@ export const log = {
 };
 
 function debug(...args: any[]) {
-  if (process.env.NODE_ENV === 'development') console.info('DEBUG:', logPrefix, ...args);
+  // if (process.env.NODE_ENV === 'development') console.info('DEBUG:', logPrefix, ...args);
+  console.info('DEBUG:', logPrefix, ...args);
 }
