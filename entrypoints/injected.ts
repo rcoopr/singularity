@@ -10,7 +10,7 @@ export default defineUnlistedScript(() => {
 
   if (window.ace) {
     initContextTracking();
-    initCursorTracking();
+    // initCursorTracking();
   }
 
   onMessage('insert', (message) => {

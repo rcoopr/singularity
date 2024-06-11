@@ -64,6 +64,7 @@ export default defineBackground(() => {
 
   browser.runtime.onInstalled.addListener(async () => {
     await createContextMenus();
+    browser.runtime.reload();
   });
 
   browser.tabs.onActivated.addListener(async (info) => {
@@ -205,12 +206,20 @@ function createGlobalBoilerplateWithUtilsSnippet(snippets: Snippet[]): SnippetIn
     .map((snippet) => {
       const lines = snippet.code.split('\n');
       let snippetBody: string | undefined;
+      let snippetNameAdded = false;
       let assignmentsEnded = false;
       for (let i = 0; assignmentsEnded === false; i++) {
         if (lines[i].startsWith('context.global')) {
+          if (!snippetNameAdded) {
+            assignments.push(`// ${snippet.name}${snippet.desc ? ` - ${snippet.desc}` : ''}`);
+            snippetNameAdded = true;
+          }
           assignments.push(lines[i]);
         } else if (lines[i].trim().length > 0) {
           assignmentsEnded = true;
+          if (assignments.length > 0) {
+            assignments[assignments.length - 1] += '\n';
+          }
           snippetBody = lines.splice(i).join('\n\t\t\t');
         }
       }
