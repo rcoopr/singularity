@@ -26,3 +26,5 @@ export const langAbbreviations = {
   javascript: 'JS',
   typescript: 'TS',
 };
+
+export const noop = () => {};

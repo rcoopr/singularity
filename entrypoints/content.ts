@@ -40,5 +40,5 @@ async function syncKeybindsOption() {
       platform,
     },
     'window'
-  ).catch((e) => log.warn(e));
+  ).catch(noop);
 }

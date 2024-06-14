@@ -3,13 +3,14 @@ import { enableKeybinds } from '@/utils/keybindings/keybindings';
 import { CursorPosition } from '@/types/cursor';
 import { SnippetContext } from '@/utils/snippets/repo';
 import { onMessage, sendMessage, setNamespace } from 'webext-bridge/window';
+import { noop } from '@/utils/misc';
 
 export default defineUnlistedScript(() => {
   log.debug('Injected script init');
   setNamespace('com.rcoopr.singularity');
 
   if (window.ace) {
-    initContextTracking();
+    // initContextTracking();
     // initCursorTracking();
   }
 
@@ -67,7 +68,7 @@ async function initCursorTracking() {
         },
       },
       'background'
-    ).catch((e) => log.warn(e));
+    ).catch(noop);
   };
 
   editor.session.selection.on('changeCursor', cursorChangeHandler);
@@ -76,9 +77,7 @@ async function initCursorTracking() {
 async function initContextTracking() {
   const activeTab = await waitForEl('.code-editor-tab.active');
 
-  sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background').catch((e) =>
-    log.warn(e)
-  );
+  sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background').catch(noop);
 
   const tabs = await waitForEl('.code-editor-tabs');
   if (tabs && tabs.parentElement) {
@@ -92,7 +91,7 @@ async function initContextTracking() {
           const activeTab = mutation.target.querySelector('.code-editor-tab.active');
           log.debug('Active tab:', activeTab?.textContent);
           sendMessage('context', getContextFromTabName(activeTab?.textContent), 'background').catch(
-            (e) => log.warn(e)
+            noop
           );
         }
       }
@@ -167,8 +166,6 @@ function insertIntoActiveElement(text: string) {
 }
 
 function getContextFromTabName(tabName: string | null | undefined): SnippetContext | null {
-  if (!tabName) return null;
-  return tabName in tabNameContextMap
-    ? tabNameContextMap[tabName as keyof typeof tabNameContextMap]
-    : 'composition';
+  if (!tabName || !(tabName in tabNameContextMap)) return null;
+  return tabNameContextMap[tabName as keyof typeof tabNameContextMap];
 }

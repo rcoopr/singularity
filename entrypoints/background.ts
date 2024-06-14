@@ -62,17 +62,21 @@ export default defineBackground(() => {
     // store for later use in popup quick-actions
   });
 
-  browser.runtime.onInstalled.addListener(async () => {
+  browser.runtime.onInstalled.addListener(async (details) => {
     await createContextMenus();
-    browser.runtime.reload();
+    log.debug('background.onInstalled', details);
+
+    if (details.reason === 'update' && details.previousVersion !== '0.0.6') {
+      browser.runtime.reload();
+    }
   });
 
-  browser.tabs.onActivated.addListener(async (info) => {
-    if (!browser.runtime.id) return;
+  // browser.tabs.onActivated.addListener(async (info) => {
+  //   if (!browser.runtime.id) return;
 
-    currentTab = info.tabId;
-    await createContextMenus();
-  });
+  //   currentTab = info.tabId;
+  //   await createContextMenus();
+  // });
 
   options.keybindings.watch(async (preset) => {
     if (!browser.runtime.id) return;
@@ -164,9 +168,7 @@ export default defineBackground(() => {
             }
             log.debug('send insert message', snippet.code, tab.id);
             if (tab.id && browser.runtime.id) {
-              sendMessage('insert', { code: snippet.code }, `window@${tab.id}`).catch((e) =>
-                log.warn(e)
-              );
+              sendMessage('insert', { code: snippet.code }, `window@${tab.id}`).catch(noop);
             }
           }
         });
