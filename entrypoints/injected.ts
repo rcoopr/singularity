@@ -1,4 +1,3 @@
-import { AceSelectionEventHandler } from '@/types/ace';
 import { enableKeybinds } from '@/utils/keybindings/keybindings';
 import { CursorPosition } from '@/types/cursor';
 import { SnippetContext } from '@/utils/snippets/repo';
@@ -11,7 +10,6 @@ export default defineUnlistedScript(() => {
 
   if (window.ace) {
     initContextTracking();
-    // initCursorTracking();
   }
 
   onMessage('insert', (message) => {
@@ -47,31 +45,6 @@ async function getEditor() {
     editor = window.ace.edit(el);
   }
   return editor;
-}
-
-async function initCursorTracking() {
-  const editor = await getEditor();
-  if (!editor) return;
-
-  const cursorChangeHandler: AceSelectionEventHandler<'changeCursor'> = (_event, details) => {
-    log.debug('Cursor position:', details.lead.row, details.lead.column);
-    sendMessage(
-      'cursorPosition',
-      {
-        anchor: {
-          row: details.anchor.row,
-          column: details.anchor.column,
-        },
-        lead: {
-          row: details.lead.row,
-          column: details.lead.column,
-        },
-      },
-      'background'
-    ).catch(noop);
-  };
-
-  editor.session.selection.on('changeCursor', cursorChangeHandler);
 }
 
 async function initContextTracking() {

@@ -1,5 +1,4 @@
 import { KeybindPreset } from '@/utils/keybindings/keybindings';
-import { CursorPosition } from '@/types/cursor';
 import { prefersDark } from '@/utils/preferences/color-scheme';
 import { SnippetContext } from '@/utils/snippets/repo';
 import { BundledTheme } from 'shiki';
@@ -13,7 +12,6 @@ export type Preferences = {
 
 export type Config = {
   platform: Platform;
-  tabsCursorPosition: Record<string, CursorPosition>;
   tabsContext: Record<number, SnippetContext | null>;
 };
 
@@ -36,9 +34,6 @@ export const config: {
 } = {
   platform: storage.defineItem<Platform>('local:platform', {
     defaultValue: 'win',
-  }),
-  tabsCursorPosition: storage.defineItem<Config['tabsCursorPosition']>('session:cursorPosition', {
-    defaultValue: {},
   }),
   tabsContext: storage.defineItem<Config['tabsContext']>('session:currentContext', {
     defaultValue: {},

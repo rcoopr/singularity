@@ -7,36 +7,19 @@
     <meta name="manifest.type" content="browser_action" />
     <link href="@/assets/tailwind.css" rel="stylesheet" />
     <link href="@/assets/ui.css" rel="stylesheet" />
+    <link href="@/components/quick-actions/quick-actions.css" rel="stylesheet" />
     <!-- <link href="@/components/combobox/combobox.css" rel="stylesheet" /> -->
   </head>
   <body class="place-items-center dark">
-    <div id="app" class="h-full flex flex-col gap-2">
-      <h1 class="font-mono text-xl text-center">Singularity</h1>
-      <hr class="border-zinc-600" />
-      <section id="quick-actions">
-        <!-- <div class="custom-combobox">
-          <input type="text" placeholder="Search..." />
-          <button class="clear-btn">&#10005;</button>
-          <div class="dropdown">
-            <div class="dropdown-option">
-              <button class="main-btn">Option 1</button>
-              <button class="quick-action-btn">&#9733;</button>
-            </div>
-          </div>
-        </div> -->
-        <!-- <input
-          id="search"
-          type="search"
-          list="snippets"
-          placeholder="Search for snippets..."
-          class="appearance-none p-2 rounded-md border-2 border-btn-bg bg-btn-fg focus:border-transparent w-full text-base focus:-outline-offset-0 flex items-center"
-        />
-        <datalist id="snippets">
-          <option value="init"></option>
-          <option value="boilerplate"></option>
-        </datalist> -->
-      </section>
-      <button id="manager-link" class="primary">Manage Snippets</button>
+    <div id="app" class="h-full flex flex-col gap-2 px-8 pb-8">
+      <div
+        class="flex flex-col gap-2 sticky top-0 pt-8 z-10 bg-bg px-8 -mx-8 pb-1 mb-2 after:absolute after:top-full after:w-full after:h-4 after:bg-gradient-to-b after:from-bg"
+      >
+        <h1 class="font-mono text-xl text-center">Singularity</h1>
+        <hr class="border-zinc-600 mb-3" />
+        <button id="manager-link" class="primary">Manage Snippets</button>
+      </div>
+      <section id="quick-actions"></section>
       <p class="text-zinc-500 dark:text-zinc-400 mt-4 text-center">
         Made by <a target="_blank" href="https://github.com/rcoopr">Ross Cooper</a>
       </p>

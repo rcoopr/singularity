@@ -35,7 +35,8 @@ export default defineBackground(() => {
     // if (!isInternalEndpoint(message.sender) || !browser.runtime.id) return;
     if (!browser.runtime.id) return;
 
-    currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
+    currentTab =
+      currentTab || (await browser.tabs.query({ active: true, currentWindow: true }))?.[0]?.id;
     if (currentTab) {
       const tabsContext = await config.tabsContext.getValue();
       config.tabsContext.setValue({
@@ -45,21 +46,6 @@ export default defineBackground(() => {
     }
     log.debug('Context:', message.data, currentTab);
     await createContextMenus();
-  });
-
-  onMessage('cursorPosition', async (message) => {
-    // if (!isInternalEndpoint(message.sender) || !browser.runtime.id) return;
-    if (!browser.runtime.id) return;
-
-    currentTab = currentTab || (await browser.tabs.query({ active: true }))?.[0]?.id;
-    if (currentTab) {
-      const allTabsCursorPositions = await config.tabsCursorPosition.getValue();
-      config.tabsCursorPosition.setValue({
-        ...allTabsCursorPositions,
-        [currentTab]: message.data,
-      });
-    }
-    // store for later use in popup quick-actions
   });
 
   browser.runtime.onInstalled.addListener(async (details) => {
