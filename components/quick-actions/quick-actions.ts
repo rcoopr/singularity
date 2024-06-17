@@ -12,7 +12,7 @@ export async function appendQuickActions(el: HTMLElement) {
     return;
   }
 
-  const currentTab = (await browser.tabs.query({ active: true, currentWindow: true }))?.[0]?.id;
+  const currentTab = (await browser.tabs.query({ active: true, lastFocusedWindow: true }))?.[0]?.id;
   if (!currentTab) {
     return;
   }

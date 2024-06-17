@@ -36,7 +36,7 @@ export default defineBackground(() => {
     if (!browser.runtime.id) return;
 
     currentTab =
-      currentTab || (await browser.tabs.query({ active: true, currentWindow: true }))?.[0]?.id;
+      currentTab || (await browser.tabs.query({ active: true, lastFocusedWindow: true }))?.[0]?.id;
     if (currentTab) {
       const tabsContext = await config.tabsContext.getValue();
       config.tabsContext.setValue({
