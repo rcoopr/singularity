@@ -1,5 +1,9 @@
 import { options } from '@/utils/preferences/storage';
-import { groupSnippetsByContext, registerSnippetsRepo } from '@/utils/snippets/repo';
+import {
+  getSnippetsRepo,
+  groupSnippetsByContext,
+  registerSnippetsRepo,
+} from '@/utils/snippets/repo';
 import { sendMessage } from 'webext-bridge/popup';
 
 export async function appendQuickActions(el: HTMLElement) {
@@ -13,8 +17,7 @@ export async function appendQuickActions(el: HTMLElement) {
     return;
   }
 
-  const idb = openExtensionDatabase();
-  const snippetsRepo = registerSnippetsRepo(idb);
+  const snippetsRepo = getSnippetsRepo();
 
   try {
     const nonFavouriteSnippets = (await snippetsRepo.getAll()).filter(

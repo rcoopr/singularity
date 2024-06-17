@@ -185,7 +185,6 @@ async function deleteSnippetFormHandler(formData: FormData) {
   return await snippetsRepo.delete(id);
 }
 
-// This function assumes that you have a function getSnippets() that returns all snippets
 export async function exportSnippets() {
   const snippetsRepo = getSnippetsRepo();
   const snippets = await snippetsRepo.getAll();
