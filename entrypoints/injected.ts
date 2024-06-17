@@ -10,7 +10,7 @@ export default defineUnlistedScript(() => {
   setNamespace('com.rcoopr.singularity');
 
   if (window.ace) {
-    // initContextTracking();
+    initContextTracking();
     // initCursorTracking();
   }
 
@@ -166,6 +166,11 @@ function insertIntoActiveElement(text: string) {
 }
 
 function getContextFromTabName(tabName: string | null | undefined): SnippetContext | null {
-  if (!tabName || !(tabName in tabNameContextMap)) return null;
+  // If the tab has not textContent, return null (context menu will show all options)
+  if (!tabName) return null;
+
+  // If the tab is not in the map, return the default context
+  if (!(tabName in tabNameContextMap)) return 'composition';
+
   return tabNameContextMap[tabName as keyof typeof tabNameContextMap];
 }

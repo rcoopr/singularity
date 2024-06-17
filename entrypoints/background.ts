@@ -66,17 +66,17 @@ export default defineBackground(() => {
     await createContextMenus();
     log.debug('background.onInstalled', details);
 
-    if (details.reason === 'update' && details.previousVersion !== '0.0.6') {
+    if (details.reason === 'update' && details.previousVersion !== '0.0.7') {
       browser.runtime.reload();
     }
   });
 
-  // browser.tabs.onActivated.addListener(async (info) => {
-  //   if (!browser.runtime.id) return;
+  browser.tabs.onActivated.addListener(async (info) => {
+    if (!browser.runtime.id) return;
 
-  //   currentTab = info.tabId;
-  //   await createContextMenus();
-  // });
+    currentTab = info.tabId;
+    await createContextMenus();
+  });
 
   options.keybindings.watch(async (preset) => {
     if (!browser.runtime.id) return;
