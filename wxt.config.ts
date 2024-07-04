@@ -8,7 +8,7 @@ export default defineConfig({
   manifest: {
     web_accessible_resources: [
       {
-        resources: ['/injected.js'],
+        resources: ['/injected.js', '/uno-layout.js', '/content-scripts/uno.css'],
         matches: ['<all_urls>'],
       },
     ],

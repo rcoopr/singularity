@@ -1,0 +1,44 @@
+.page {
+  flex-direction: row-reverse;
+}
+
+.page-column {
+  position: relative;
+  background: var(--sl-panel-bg);
+}
+
+.page-column.controls {
+  max-width: 275px;
+  background: #0a0910;
+}
+
+.tnl-controls-title {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.tnl-controls-title .app-field-label {
+  font-size: var(--sl-label-font-size, 16px);
+  color: var(--sl-label-font-color, #303030);
+  font-weight: 600;
+  padding: 20px 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+  min-width: 130px;
+  height: 30px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.special-menu-items {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+  align-items: end;
+  justify-content: space-around;
+}

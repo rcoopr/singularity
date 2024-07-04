@@ -52,7 +52,7 @@ export default defineBackground(() => {
     await createContextMenus();
     log.debug('background.onInstalled', details);
 
-    if (details.reason === 'update' && details.previousVersion !== '0.0.8') {
+    if (details.reason === 'update' && details.previousVersion !== '0.0.9') {
       browser.runtime.reload();
     }
   });

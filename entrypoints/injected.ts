@@ -3,6 +3,7 @@ import { CursorPosition } from '@/types/cursor';
 import { SnippetContext } from '@/utils/snippets/repo';
 import { onMessage, sendMessage, setNamespace } from 'webext-bridge/window';
 import { noop } from '@/utils/misc';
+import { waitForEl } from '../utils/wait-for-el';
 
 export default defineUnlistedScript(() => {
   log.debug('Injected script init');
@@ -74,31 +75,6 @@ async function initContextTracking() {
       childList: true,
     });
   }
-}
-
-function waitForEl<T extends Element>(selector: string): Promise<T | null | undefined> {
-  return new Promise((resolve) => {
-    if (document.querySelector(selector)) {
-      return resolve(document.querySelector(selector) as T | null);
-    }
-
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if (node instanceof HTMLElement && node.querySelector(selector)) {
-            observer.disconnect();
-            resolve(document.querySelector(selector) as T | null);
-          }
-        }
-      }
-    });
-
-    // If you get "parameter 1 is not of type 'Node'" error, see https://stackoverflow.com/a/77855838/492336
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-  });
 }
 
 function insertIntoAceEditor({ code, position }: { code: string; position?: CursorPosition }) {

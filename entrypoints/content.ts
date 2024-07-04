@@ -2,10 +2,8 @@ import { config, options } from '@/utils/preferences/storage';
 import { injectScript } from '../utils/inject-script';
 import { allowWindowMessaging, sendMessage } from 'webext-bridge/content-script';
 
-let isInjected = false;
-
 export default defineContentScript({
-  matches: ['*://app.singular.live/compositions/*', '*://www.google.com/*'],
+  matches: ['*://www.google.com/*', '*://app.singular.live/compositions/*'],
   main() {
     log.debug('Content script init');
     if (
@@ -16,7 +14,6 @@ export default defineContentScript({
     }
 
     injectScript('/injected.js', () => {
-      isInjected = true;
       syncKeybindsOption();
     });
 
