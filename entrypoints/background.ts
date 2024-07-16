@@ -11,7 +11,7 @@ import type { SetRequired } from 'type-fest';
 import { registerUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 import { config, options } from '@/utils/preferences/storage';
 import { onMessage, sendMessage } from 'webext-bridge/background';
-import { transpile } from 'typescript';
+import { transpile } from '@/utils/sucrase/transpile';
 // import { isInternalEndpoint } from 'webext-bridge';
 
 export default defineBackground(() => {

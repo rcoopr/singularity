@@ -4,7 +4,7 @@ import {
   groupSnippetsByContext,
   registerSnippetsRepo,
 } from '@/utils/snippets/repo';
-import { transpile } from 'typescript';
+import { transpile } from '@/utils/sucrase/transpile';
 import { sendMessage } from 'webext-bridge/popup';
 
 export async function appendQuickActions(el: HTMLElement) {
