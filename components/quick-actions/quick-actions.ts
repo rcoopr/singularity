@@ -4,6 +4,7 @@ import {
   groupSnippetsByContext,
   registerSnippetsRepo,
 } from '@/utils/snippets/repo';
+import { transpile } from 'typescript';
 import { sendMessage } from 'webext-bridge/popup';
 
 export async function appendQuickActions(el: HTMLElement) {
@@ -36,11 +37,12 @@ export async function appendQuickActions(el: HTMLElement) {
       contextDiv.appendChild(contextTitle);
 
       for (const snippet of snippets) {
+        const code = snippet.lang === 'typescript' ? transpile(snippet.code).trim() : snippet.code;
         const button = document.createElement('button');
         button.classList.add('quick-action');
         button.textContent = snippet.name;
         button.addEventListener('click', () => {
-          sendMessage('insert', { code: snippet.code }, `window@${currentTab}`).catch(noop);
+          sendMessage('insert', { code }, `window@${currentTab}`).catch(noop);
         });
         contextDiv.appendChild(button);
       }

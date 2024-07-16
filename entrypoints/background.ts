@@ -11,6 +11,7 @@ import type { SetRequired } from 'type-fest';
 import { registerUpdateContextMenuRepo } from '@/utils/context-menus/repo';
 import { config, options } from '@/utils/preferences/storage';
 import { onMessage, sendMessage } from 'webext-bridge/background';
+import { transpile } from 'typescript';
 // import { isInternalEndpoint } from 'webext-bridge';
 
 export default defineBackground(() => {
@@ -52,7 +53,7 @@ export default defineBackground(() => {
     await createContextMenus();
     log.debug('background.onInstalled', details);
 
-    if (details.reason === 'update' && details.previousVersion !== '0.0.9') {
+    if (details.reason === 'update' && details.previousVersion !== '0.0.10') {
       browser.runtime.reload();
     }
   });
@@ -152,9 +153,11 @@ export default defineBackground(() => {
               log.warn('Matching snippet was not found', info.menuItemId, contextMenuItemMap);
               return;
             }
-            log.debug('send insert message', snippet.code, tab.id);
+            const code =
+              snippet.lang === 'typescript' ? transpile(snippet.code).trim() : snippet.code;
+            log.debug('send insert message', code, tab.id);
             if (tab.id && browser.runtime.id) {
-              sendMessage('insert', { code: snippet.code }, `window@${tab.id}`).catch(noop);
+              sendMessage('insert', { code }, `window@${tab.id}`).catch(noop);
             }
           }
         });
