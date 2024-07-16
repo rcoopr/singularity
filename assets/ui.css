@@ -26,7 +26,6 @@ body {
   --btn-bg: 25 23 36;
 
   margin: 0;
-  padding: 0 40px;
   display: flex;
   min-width: 320px;
   color: rgb(var(--fg));
