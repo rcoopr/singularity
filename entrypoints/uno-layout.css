@@ -42,3 +42,41 @@
   align-items: end;
   justify-content: space-around;
 }
+
+.controls .tile-grid.three-columns {
+  grid-template-columns: minmax(50px, max-content) max-content 0;
+}
+
+.controls .tile-grid.three-columns > :nth-child(3n) {
+  opacity: 0;
+}
+
+.tnl-custom-message {
+  padding: 4rem;
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+.tnl-toggle-button {
+  width: 32px;
+  height: 32px;
+  padding: 12px;
+  margin-right: 8px;
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzg4ODg4OCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xOS41IDEySDgiLz48cGF0aCBzdHJva2UtbGluZWpvaW49InJvdW5kIiBkPSJNOSA0SDdhMyAzIDAgMCAwLTMgM3YxMGEzIDMgMCAwIDAgMyAzaDJtNy00bDQtNGwtNC00Ii8+PC9nPjwvc3ZnPg==');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px;
+  transition: rotate 0.5s ease-in-out;
+}
+
+.tnl-toggle-button:hover {
+  background-color: var(--sl-button-background);
+}
+
+.controls .tnl-toggle-button {
+  transform: rotate(180deg);
+}
+
+.pointer {
+  cursor: pointer;
+}

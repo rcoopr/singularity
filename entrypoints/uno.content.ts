@@ -10,121 +10,117 @@ export default defineContentScript({
 
     const document = await waitForIFrameDocument();
     const page = await waitForEl<HTMLElement>('.page', document);
-    const menuItemsRoot = page.querySelector('.menu-wrapper--inner');
+    const menuItems = page?.querySelector('.menu-wrapper--inner') as MaybeHTMLElement;
+    const controls = page?.querySelector('div[data-index="0"] .tile.scroll') as MaybeHTMLElement;
 
     // Horizontal menu only has a 'Control' item with multiple overlays
-    const hasControls = menuItemsRoot?.firstChild?.textContent === 'Control';
-    if (!hasControls) return;
-
-    const controls = page?.querySelector('div[data-index="0"] .tile.scroll');
+    const hasControls = menuItems?.firstChild?.textContent === 'Control';
+    if (!menuItems || !hasControls) {
+      log.info('No controls found');
+      return;
+    }
 
     if (!document || !page || !controls) {
       log.warn('No content found');
       return;
     }
 
-    const css = await loadCss();
-    const styles = document.createElement('style');
-    styles.textContent = css;
-    document.head.append(styles);
-
-    const pageColumn = document.createElement('div');
-    pageColumn.classList.add('page-column', 'controls');
-    const controlsClone = controls.cloneNode(true) as HTMLElement;
-    const tileGrid = controls.querySelector('.tile-grid');
-    const tileGridClone = controlsClone.querySelector('.tile-grid');
-    if (!tileGridClone) return;
-
-    const menuClone = controlsClone.querySelector('.tile-content') as MaybeHTMLElement;
-    const menuTitleClone = menuClone?.firstChild as MaybeHTMLElement;
-
-    if (menuTitleClone) {
-      const newMenuTitle = document.createElement('div');
-      newMenuTitle.classList.add('tnl-controls-title');
-
-      const specialMenuItemsContainer = document.createElement('div');
-      specialMenuItemsContainer.classList.add('special-menu-items');
-      const customizeLabel = document.createElement('label');
-      customizeLabel.classList.add('tile-grid-label', 'underline');
-      customizeLabel.textContent = 'Customize';
-
-      const settingsLabel = document.createElement('label');
-      settingsLabel.classList.add('tile-grid-label', 'underline');
-      settingsLabel.textContent = 'Settings';
-
-      customizeLabel.onclick = () =>
-        (menuItemsRoot.lastChild?.previousSibling?.firstChild as MaybeHTMLElement)?.click();
-      settingsLabel.onclick = () =>
-        (menuItemsRoot.lastChild?.firstChild as MaybeHTMLElement)?.click();
-
-      specialMenuItemsContainer.append(customizeLabel, settingsLabel);
-      newMenuTitle.append(menuTitleClone, specialMenuItemsContainer);
-      // menuClone?.prepend(newMenuTitle);
-      pageColumn.append(newMenuTitle);
-    }
-
-    for (let i = 0; i < tileGridClone.children.length; i++) {
-      const child = tileGridClone?.children[i] as MaybeHTMLElement;
-      if (!child) continue;
-
-      // remove Slot dropdowns
-      if (child.tagName === 'SPAN') {
-        child.outerHTML = '<span></span>';
-        continue;
-      }
-
-      // add event handlers to checkboxes
-      else if (child.tagName === 'DIV') {
-        const inputClone = child.querySelector('input');
-        const input = tileGrid?.children[i]?.querySelector('input');
-
-        if (!input || !inputClone) {
-          log.warn(`Mismatched inputs (${i})`, { input, inputClone });
-          continue;
-        }
-
-        // send click event to original input
-        inputClone.onclick = () => input.click();
-
-        // sync state from original input
-        input.onchange = (e) => (inputClone.checked = (e.target as HTMLInputElement)?.checked);
-
-        continue;
-      }
-
-      // add event handlers to overlay titles
-      else if (child.tagName === 'LABEL') {
-        // const menuItem
-        if (!menuItemsRoot) {
-          log.warn('No menu items found');
-          continue;
-        }
-
-        const menuItem = menuItemsRoot.children[1 + Math.floor(i / 3)];
-        const menuItemClickElement = menuItem?.firstChild as MaybeHTMLElement;
-
-        if (menuItemClickElement) child.onclick = () => menuItemClickElement.click();
-      }
-    }
-
-    // for (const node of tileGridClone?.children || []) {
-    //   // remove Slot dropdowns
-    //   if (node.tagName === 'SPAN') node.outerHTML = '<span></span>';
-
-    //   if (node.tagName === 'DIV') {
-    //     const input = node.querySelector('input');
-    //     if (input) {
-    //       input.onclick = function (e) {
-    //         console.log('clicked', e);
-    //       };
-    //     }
-    //   }
-    // }
-
-    pageColumn.append(controlsClone);
-    page.append(pageColumn);
+    initCustomLayout({ document, page, controls, menuItems });
   },
 });
+
+async function initCustomLayout({
+  document,
+  page,
+  controls,
+  menuItems,
+}: {
+  document: Document;
+  page: HTMLElement;
+  controls: HTMLElement;
+  menuItems: HTMLElement;
+}) {
+  const controlsOriginalParent = controls?.parentElement;
+
+  if (!document || !page || !controls) {
+    log.warn('No content found');
+    return;
+  }
+
+  // Append custom styles to iFrame
+  const css = await loadCss();
+  const styles = document.createElement('style');
+  styles.textContent = css;
+  document.head.append(styles);
+
+  // Create a new column for the controls and move the original controls into it
+  const pageColumn = document.createElement('div');
+  pageColumn.classList.add('page-column', 'controls');
+
+  page.append(pageColumn);
+  pageColumn.append(controls);
+
+  // Replace the original controls with a message
+  const messageText =
+    'Controls have been customized by the Singularity Extension.\n\nTo access the original controls, click the toggle button in the top left corner, or disable the extension.';
+  const message = document.createElement('div');
+  message.classList.add('tnl-custom-message');
+  message.textContent = messageText;
+  controlsOriginalParent?.append(message);
+
+  // Add additional controls for the settings and customize tab
+  const header = controls.querySelector('.tile-content') as MaybeHTMLElement;
+  const headerLabel = header?.firstChild as MaybeHTMLElement;
+
+  if (header && headerLabel) {
+    headerLabel.classList.add('pointer');
+
+    const customHeader = document.createElement('div');
+    customHeader.classList.add('tnl-controls-title');
+
+    const extraMenuItemsContainer = document.createElement('div');
+    extraMenuItemsContainer.classList.add('special-menu-items');
+
+    const customizeLabel = document.createElement('label');
+    customizeLabel.classList.add('tile-grid-label', 'underline');
+    customizeLabel.textContent = 'Customize';
+    customizeLabel.onclick = () =>
+      (menuItems.lastChild?.previousSibling?.firstChild as MaybeHTMLElement)?.click();
+
+    const settingsLabel = document.createElement('label');
+    settingsLabel.classList.add('tile-grid-label', 'underline');
+    settingsLabel.textContent = 'Settings';
+    settingsLabel.onclick = () => (menuItems.lastChild?.firstChild as MaybeHTMLElement)?.click();
+
+    // Attach the custom header to the new page column and move the original label and extra menu items to the new header
+    pageColumn.prepend(customHeader);
+    customHeader.append(headerLabel, extraMenuItemsContainer);
+    extraMenuItemsContainer.append(customizeLabel, settingsLabel);
+
+    // Add toggle controls
+    const toggle = document.createElement('button');
+    toggle.classList.add('tnl-toggle-button');
+    toggle.title = 'Toggle Sidebar';
+
+    toggle.onclick = () => {
+      if (!controlsOriginalParent) return;
+
+      const isCustomLayout = controlsOriginalParent.textContent === messageText;
+      if (isCustomLayout) {
+        controlsOriginalParent.innerHTML = '';
+        controlsOriginalParent.append(controls);
+        header.prepend(headerLabel);
+        pageColumn.remove();
+      } else {
+        page.append(pageColumn);
+        pageColumn.append(controls);
+        customHeader.prepend(headerLabel);
+        controlsOriginalParent?.append(message);
+      }
+    };
+    headerLabel.prepend(toggle);
+  }
+}
 
 // Notes for slots
 /**
