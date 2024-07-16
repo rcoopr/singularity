@@ -28,7 +28,8 @@ export async function updatePageTheme(theme: BundledTheme) {
   log.debug('Updating theme:', themeInfo);
   document.body.classList[themeInfo?.type === 'light' ? 'remove' : 'add']('dark');
 
-  const channels = bundledColors[theme];
+  // createThemeOptionGroups filters themes by keys of bundledColors
+  const channels = bundledColors[theme as keyof typeof bundledColors];
 
   document.body.style.setProperty('--fg', channels.fg);
   document.body.style.setProperty('--bg', channels.bg);

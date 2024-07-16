@@ -4,6 +4,7 @@ import { BundledTheme, bundledThemesInfo } from 'shiki';
 import { prefersDark } from '@/utils/preferences/color-scheme';
 import { log } from '@/utils/log';
 import { KeybindPreset, keybinds } from '@/utils/keybindings/keybindings';
+import { bundledColors } from '@/utils/shiki/bundled-colors';
 
 type OptionName = Exclude<keyof typeof options, 'platform'>;
 
@@ -61,8 +62,12 @@ async function createThemeControls() {
 }
 
 function createThemeOptionGroups() {
-  const dark = bundledThemesInfo.filter((theme) => theme.type === 'dark');
-  const light = bundledThemesInfo.filter((theme) => theme.type === 'light');
+  const dark = bundledThemesInfo.filter(
+    (theme) => theme.type === 'dark' && theme.id in bundledColors
+  );
+  const light = bundledThemesInfo.filter(
+    (theme) => theme.type === 'light' && theme.id in bundledColors
+  );
   const darkFirst = prefersDark();
 
   return html`

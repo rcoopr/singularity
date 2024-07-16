@@ -1,5 +1,7 @@
 import { Snippet, getSnippetsRepo, isSnippetContext, isValidLang } from '@/utils/snippets/repo';
 import { selectSnippet } from '@/components/snippet-manager/select-snippet';
+import { BundledTheme } from 'shiki';
+import { options, Preferences } from '@/utils/preferences/storage';
 
 var isInitialized = false;
 export function initDialogs() {
@@ -67,10 +69,23 @@ export function initDialogs() {
         reader.onload = async (e) => {
           const content = e.target?.result as string;
           const snippetsRepo = getSnippetsRepo();
-          const snippets = JSON.parse(content) as Snippet[];
-          log.debug({ content, snippets });
+          const { snippets, settings } = JSON.parse(content) as {
+            snippets: Snippet[];
+            settings: Preferences;
+          };
+          log.debug({ content, snippets, settings });
           try {
-            await snippetsRepo.import(snippets);
+            await Promise.all([
+              snippetsRepo.import(snippets),
+              ...(settings
+                ? [
+                    options.theme.setValue(settings.theme),
+                    options.useFavourites.setValue(settings.useFavourites),
+                    options.keybindings.setValue(settings.keybindings),
+                  ]
+                : []),
+            ]);
+
             selectSnippet(undefined);
           } catch (e) {
             log.error('Error importing snippets', e);
@@ -83,7 +98,7 @@ export function initDialogs() {
     });
 
     const snippetsRepo = getSnippetsRepo();
-    exportButton?.addEventListener('click', () => exportSnippets());
+    exportButton?.addEventListener('click', () => exportProfile());
     deleteAllSnippetsButton?.addEventListener('click', async () => {
       const shouldDelete = confirm(
         "Are you sure you want to delete all snippets? This action can't be undone."
@@ -185,10 +200,16 @@ async function deleteSnippetFormHandler(formData: FormData) {
   return await snippetsRepo.delete(id);
 }
 
-export async function exportSnippets() {
+export async function exportProfile() {
   const snippetsRepo = getSnippetsRepo();
-  const snippets = await snippetsRepo.getAll();
-  const json = JSON.stringify(snippets);
+  const [snippets, theme, useFavourites, keybindings] = await Promise.all([
+    snippetsRepo.getAll(),
+    options.theme.getValue(),
+    options.useFavourites.getValue(),
+    options.keybindings.getValue(),
+  ]);
+  // const snippets = await snippetsRepo.getAll();
+  const json = JSON.stringify({ snippets, settings: { theme, useFavourites, keybindings } });
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
 
@@ -203,4 +224,4 @@ export async function exportSnippets() {
 
 // Add this code where you initialize your buttons
 const exportButton = document.querySelector<HTMLButtonElement>('#exportButton');
-exportButton?.addEventListener('click', exportSnippets);
+exportButton?.addEventListener('click', exportProfile);
